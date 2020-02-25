@@ -32,8 +32,6 @@ class network_visualization:
             edge_writer.writerow(fieldnames)
             if self.list_node[3]==data_from[0]:
                 print('oui')
-            print((self.list_node[3]))
-            print((data_from[0]))   
             for i in range (len(data_from)):
                 edge_writer.writerow([self.list_node.index(data_from[i]),self.list_node.index(data_to[i])])
 
@@ -46,7 +44,6 @@ class network_visualization:
         data_edges=pd.read_csv("./data/edge_list.csv")
         self.data_edges=data_edges
         self.data_nodes=data_nodes
-        #print(data.head())
         list_node=[]
         list_layer=[]
         list_from=[]
@@ -63,6 +60,8 @@ class network_visualization:
         
         
         self.list_node=list_node
+        print("ggg\n")
+        print(self.list_node)
         self.list_layer=list_layer
         self.list_from=list_from
         self.list_to=list_to
@@ -75,47 +74,52 @@ class network_visualization:
         edge_dimension=len(self.list_from)
         self.edge_number=edge_dimension
         self.node_number=matrix_dimension
-        
-
         adjacency_matrix=np.zeros((matrix_dimension,matrix_dimension))
 
-    
-        print(adjacency_matrix)
-        #Adj=np.array(adjacency_matrix)
-
-        #print(Adj)
 
         for i in range(edge_dimension):
             current_node_from=self.list_from[i]
             current_node_to=self.list_to[i]
-            print(current_node_to)
             index_node_from=self.list_node.index(current_node_from)
-            #print(index_node_from)
             index_node_to=self.list_node.index(current_node_to)
             adjacency_matrix.itemset((index_node_from,index_node_to),1)
 
         return adjacency_matrix
 
 
-    #print(adjacency_matrix())
-
     def network_representation(self):
         self.adjacency_matrix()
         N=len(self.data_edges2)
         Edges=[(self.data_edges2['from'][k], self.data_edges2['to'][k]) for k in range(N)]
         G=ig.Graph(Edges, directed=False)
+        labels=['x' for k in range(self.node_number)]
+        layers=[-1 for k in range(self.node_number)]#initialization
+        for k in range(N):
+            labels[self.data_edges2['from'][k]]=self.list_node[self.data_edges2['from'][k]]
+            labels[self.data_edges2['to'][k]]=self.list_node[self.data_edges2['to'][k]]
+            layers[self.data_edges2['to'][k]]=self.list_layer[self.data_edges2['to'][k]]
+            layers[self.data_edges2['from'][k]]=self.list_layer[self.data_edges2['from'][k]]
+        
+        print(labels)
+
+        #print(self.list_layer)  
         layt=G.layout('kk',dim=3)
-        print(layt[5])
         Xn=[layt[k][0] for k in range(N)]# x-coordinates of nodes
         Yn=[layt[k][1] for k in range(N)]# y-coordinates
-        Zn=[layt[k][2] for k in range(N)]# z-coordinates
+        Zn=[0 for k in range(self.node_number)]# z-coordinates
         Xe=[]
         Ye=[]
         Ze=[]
+        for k in range(N):
+            Zn[self.data_edges2['from'][k]]=self.list_layer[self.data_edges2['from'][k]]
+            Zn[self.data_edges2['to'][k]]=self.list_layer[self.data_edges2['to'][k]]
+           
+        
         for e in Edges:
             Xe+=[layt[e[0]][0],layt[e[1]][0], None]# x-coordinates of edge ends
             Ye+=[layt[e[0]][1],layt[e[1]][1], None]
-            Ze+=[layt[e[0]][2],layt[e[1]][2], None]
+            Ze+=[Zn[e[0]],Zn[e[1]], None]
+
 
                 
         import plotly.graph_objs as go
@@ -134,10 +138,12 @@ class network_visualization:
                     mode='markers',
                     name='actors',
                     marker=dict(symbol='circle',
-                                    size=6,
+                                    size=15,
+                                    color=layers,
                                     colorscale='Viridis',
-                                    line=dict(color='rgb(50,50,50)', width=0.5)
+                                    line=dict(color='rgb(50,50,50)', width=0.9)
                                     ),
+                    text=labels,
                     hoverinfo='text'
                     )
 
@@ -165,8 +171,8 @@ class network_visualization:
             hovermode='closest',
             annotations=[
                 dict(
-                showarrow=False,
-                    text="Data source: <a href='http://bost.ocks.org/mike/miserables/miserables.json'>[1] miserables.json</a>",
+                showarrow=True,
+                    text="Data source:Wei-Ting data sample",
                     xref='paper',
                     yref='paper',
                     x=0,
