@@ -10,6 +10,10 @@ import csv
 import time
 import numpy as np
 import igraph as ig
+#For animations
+
+import plotly.express as px
+
 class network_visualization:
     def __init__(self):
         self.edge_number=0
@@ -30,8 +34,6 @@ class network_visualization:
             edge_writer = csv.writer(edge_list_numbers, delimiter=',', quotechar='"', quoting=csv.QUOTE_MINIMAL)
             fieldnames = ['to', 'from']
             edge_writer.writerow(fieldnames)
-            if self.list_node[3]==data_from[0]:
-                print('oui')
             for i in range (len(data_from)):
                 edge_writer.writerow([self.list_node.index(data_from[i]),self.list_node.index(data_to[i])])
 
@@ -60,7 +62,6 @@ class network_visualization:
         
         
         self.list_node=list_node
-        print("ggg\n")
         print(self.list_node)
         self.list_layer=list_layer
         self.list_from=list_from
@@ -100,9 +101,7 @@ class network_visualization:
             layers[self.data_edges2['to'][k]]=self.list_layer[self.data_edges2['to'][k]]
             layers[self.data_edges2['from'][k]]=self.list_layer[self.data_edges2['from'][k]]
         
-        print(labels)
 
-        #print(self.list_layer)  
         layt=G.layout('kk',dim=3)
         Xn=[layt[k][0] for k in range(N)]# x-coordinates of nodes
         Yn=[layt[k][1] for k in range(N)]# y-coordinates
@@ -128,7 +127,7 @@ class network_visualization:
                     y=Ye,
                     z=Ze,
                     mode='lines',
-                    line=dict(color='rgb(125,125,125)', width=1),
+                    line=dict(color='rgb(125,125,125)', width=2.5),
                     hoverinfo='none'
                     )
 
@@ -136,12 +135,12 @@ class network_visualization:
                     y=Yn,
                     z=Zn,
                     mode='markers',
-                    name='actors',
+                    name='parameters',
                     marker=dict(symbol='circle',
                                     size=15,
                                     color=layers,
                                     colorscale='Viridis',
-                                    line=dict(color='rgb(50,50,50)', width=0.9)
+                                    line=dict(color='rgb(50,50,50)', width=4)
                                     ),
                     text=labels,
                     hoverinfo='text'
@@ -165,9 +164,6 @@ class network_visualization:
                     yaxis=dict(axis),
                     zaxis=dict(axis),
                 ),
-            margin=dict(
-                t=100
-            ),
             hovermode='closest',
             annotations=[
                 dict(
@@ -185,9 +181,55 @@ class network_visualization:
                     )
                 ],    )
         data=[trace1, trace2]
+        data.append(go.Mesh3d(
+        # 8 vertices of a cube
+        x=[-4, 4, 4, -4, -4, 4, 4, -4],
+        y=[-4, -4, 4, 4, -4, -4, 4, 4],
+        z=[1, 1, 1, 1, 1, 1, 1, 1],
+        colorbar_title='z',
+        colorscale=[[0, 'gold'],
+                    [0, 'mediumturquoise'],
+                    [0, 'magenta']],
+        # Intensity of each vertex, which will be interpolated and color-coded
+        intensity = np.linspace(0, 1, 3, endpoint=True),
+        # i, j and k give the vertices of triangles
+        i = [7, 0, 0, 0, 4, 4, 6, 6, 4, 0, 3, 2],
+        j = [3, 4, 1, 2, 5, 6, 5, 2, 0, 1, 6, 3],
+        k = [0, 7, 2, 3, 6, 7, 1, 1, 5, 5, 7, 6],
+        name='Layer t',
+        showlegend=True,
+        opacity=0.2,
+
+
+        showscale=False
+    ))
+        data.append(go.Mesh3d(
+            # 8 vertices of a cube
+            x=[-4, 4, 4, -4, -4, 4, 4, -4],
+            y=[-4, -4, 4, 4, -4, -4, 4, 4],
+            z=[0, 0, 0, 0, 0, 0, 0, 0],
+            colorbar_title='z',
+            colorscale=[[0, 'gold'],
+                        [0.5, 'mediumturquoise'],
+                        [1, 'magenta']],
+            # Intensity of each vertex, which will be interpolated and color-coded
+            intensity = np.linspace(0, 1, 1, endpoint=True),
+            # i, j and k give the vertices of triangles
+            i = [7, 0, 0, 0, 4, 4, 6, 6, 4, 0, 3, 2],
+            j = [3, 4, 1, 2, 5, 6, 5, 2, 0, 1, 6, 3],
+            k = [0, 7, 2, 3, 6, 7, 1, 1, 5, 5, 7, 6],
+
+            name='layer t-1',
+            showscale=False,
+            showlegend=True,
+            opacity=0.2
+        ))
+
         fig=go.Figure(data=data, layout=layout)
 
+        print(" Please wait for the visualization...")
         plotly.offline.plot(fig, filename='Data-Visualization.html')
+        print(" 3D visualization done...")
 
   
 
