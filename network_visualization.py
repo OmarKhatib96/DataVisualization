@@ -101,6 +101,7 @@ class network_visualization:
             layers[self.data_edges2['from'][k]]=self.list_layer[self.data_edges2['from'][k]]
         
 
+
         layt=G.layout('kk',dim=3)
         Xn=[layt[k][0] for k in range(N)]# x-coordinates of nodes
         Yn=[layt[k][1] for k in range(N)]# y-coordinates
@@ -163,9 +164,9 @@ class network_visualization:
         y=[-4, -4, 4, 4, -4, -4, 4, 4],
         z=[1, 1, 1, 1, 1, 1, 1, 1],
         colorbar_title='z',
-        colorscale=[[0, 'gold'],
-                    [0, 'mediumturquoise'],
-                    [0, 'magenta']],
+        colorscale=[[0, 'blue'],
+                    [0.5, 'blue'],
+                    [1, 'blue']],
         # Intensity of each vertex, which will be interpolated and color-coded
         intensity = np.linspace(0, 1, 3, endpoint=True),
         # i, j and k give the vertices of triangles
@@ -183,9 +184,9 @@ class network_visualization:
             y=[-4, -4, 4, 4, -4, -4, 4, 4],
             z=[0, 0, 0, 0, 0, 0, 0, 0],
             colorbar_title='z',
-            colorscale=[[0, 'gold'],
-                        [0.5, 'mediumturquoise'],
-                        [1, 'magenta']],
+            colorscale=[[0, 'red'],
+                        [0.5, 'red'],
+                        [1, 'red']],
             # Intensity of each vertex, which will be interpolated and color-coded
             intensity = np.linspace(0, 1, 1, endpoint=True),
            
