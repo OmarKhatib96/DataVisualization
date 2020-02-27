@@ -12,6 +12,7 @@ import numpy as np
 import igraph as ig
 #For animations
 
+import plotly.express as px
 
 class network_visualization:
     def __init__(self):
@@ -190,7 +191,6 @@ class network_visualization:
                     y=Ye,
                     z=Ze,
                     mode='lines',
-                    name='Interaction between parameters',
                     line=dict(color='rgb(125,125,125)', width=2.5),
                     hoverinfo='none'
                     )
@@ -199,7 +199,7 @@ class network_visualization:
                     y=Yn,
                     z=Zn,
                     mode='markers',
-                    name='Parameters',
+                    name='parameters',
                     marker=dict(symbol='circle',
                                     size=15,
                                     color=colors,
@@ -217,9 +217,33 @@ class network_visualization:
                 showticklabels=False,
                 title=''
                 )
-       
 
-      
+        layout = go.Layout(
+                title="Data Visualization of the sample data of edge list",
+                width=1000,
+                height=1000,
+                showlegend=False,
+                scene=dict(
+                    xaxis=dict(axis),
+                    yaxis=dict(axis),
+                    zaxis=dict(axis),
+                ),
+            hovermode='closest',
+            annotations=[
+                dict(
+                showarrow=True,
+                    text="Data source:Wei-Ting data sample",
+                    xref='paper',
+                    yref='paper',
+                    x=0,
+                    y=0.1,
+                    xanchor='left',
+                    yanchor='bottom',
+                    font=dict(
+                    size=14
+                    )
+                    )
+                ],    )
         data=[trace1, trace2]
         data.append(go.Mesh3d(
         # 8 vertices of a cube
@@ -233,6 +257,9 @@ class network_visualization:
         # Intensity of each vertex, which will be interpolated and color-coded
         intensity = np.linspace(0, 1, 3, endpoint=True),
         # i, j and k give the vertices of triangles
+        i = [7, 0, 0, 0, 4, 4, 6, 6, 4, 0, 3, 2],
+        j = [3, 4, 1, 2, 5, 6, 5, 2, 0, 1, 6, 3],
+        k = [0, 7, 2, 3, 6, 7, 1, 1, 5, 5, 7, 6],
         name='Layer t',
         showlegend=True,
         opacity=0.2,
@@ -241,7 +268,6 @@ class network_visualization:
         showscale=False
     ))
         data.append(go.Mesh3d(
-           
             # 8 vertices of a cube
             x=[-4, 4, 4, -4, -4, 4, 4, -4],
             y=[-4, -4, 4, 4, -4, -4, 4, 4],
@@ -252,48 +278,21 @@ class network_visualization:
                         [1, 'magenta']],
             # Intensity of each vertex, which will be interpolated and color-coded
             intensity = np.linspace(0, 1, 1, endpoint=True),
-           
+            # i, j and k give the vertices of triangles
+            i = [7, 0, 0, 0, 4, 4, 6, 6, 4, 0, 3, 2],
+            j = [3, 4, 1, 2, 5, 6, 5, 2, 0, 1, 6, 3],
+            k = [0, 7, 2, 3, 6, 7, 1, 1, 5, 5, 7, 6],
 
-            name='Layer t-1',
+            name='layer t-1',
             showscale=False,
             showlegend=True,
             opacity=0.2
         ))
-        
-        layout = go.Layout(
-            annotations=[
-            dict(
-            showarrow=True,
-                text="Data source: Wei-Ting data sample",
-                xref='paper',
-                yref='paper',
-                x=0,
-                y=0.1,
-                xanchor='left',
-                yanchor='bottom',
-                
-                font=dict(
-                size=17
-                )
-                )
-            ],
-            scene=dict(
-            xaxis=dict(axis),
-            yaxis=dict(axis),
-            zaxis=dict(axis)),
-            title="Data Visualization of the sample data of edge list",
 
-            xaxis=go.XAxis(
-                title='x'
-            ),
-            yaxis=go.YAxis(
-                title='y'
-            )
-        )
         fig=go.Figure(data=data, layout=layout)
 
         print(" Please wait for the visualization...")
-        plotly.offline.plot(fig, filename='Layers Visualization')
+        plotly.offline.plot(fig, filename='Data-Visualization.html')
         print(" 3D visualization done...")
 
   
