@@ -43,6 +43,15 @@ class network_visualization:
     def data_importing(self):
         data_nodes=pd.read_csv("./data/node_list.csv")
         data_edges=pd.read_csv("./data/edge_list.csv")
+        data_controllable_nodes=pd.read_csv("./data/controllable_node.csv")
+        data_metrology_nodes=pd.read_csv("./data/metrology_node.csv")
+        data_FDC_nodes=pd.read_csv("./data/FDC_node.csv")
+
+        controllable_node_list=[]
+        metrology_node_list=[]
+        FDC_node_list=[]
+
+
         self.data_edges=data_edges
         self.data_nodes=data_nodes
         list_node=[]
@@ -59,7 +68,12 @@ class network_visualization:
         for to_node in data_edges['to']:
             list_to.append(to_node)
         
-        
+        for controllable_node in data_controllable_nodes['controllable_node']:
+            controllable_node_list.append(controllable_node)
+        for metrology_node in data_metrology_nodes['metrology_node']:
+            metrology_node_list.append(metrology_node)
+        for FDC_node in data_FDC_nodes['FDC_node']:
+            FDC_node_list.append(FDC_node)
         self.list_node=list_node
         print(self.list_node)
         self.list_layer=list_layer
@@ -67,6 +81,15 @@ class network_visualization:
         self.list_to=list_to
         self.writing_csv(self.list_from,self.list_to)
         self.data_edges2=pd.read_csv("./data/edge_list2.csv")
+
+        self.controllable_node_list=controllable_node_list
+        print("controllable_node_list: "+ str(self.controllable_node_list))
+
+        self.metrology_node_list=metrology_node_list
+        print("metrology_node_list: "+ str(self.metrology_node_list))
+
+        self.FDC_node_list=FDC_node_list
+        print("FDC_node_list: "+ str(self.FDC_node_list))
 
     def adjacency_matrix(self):
         self.data_importing()
@@ -94,6 +117,15 @@ class network_visualization:
         G=ig.Graph(Edges, directed=True)
         labels=['x' for k in range(self.node_number)]
         layers=[-1 for k in range(self.node_number)]#initialization
+        colors=[0 for k in range(self.node_number)] # init color
+
+        for i in range(self.node_number):
+            if self.list_node[i] in self.controllable_node_list:
+                colors[i]=0
+            if self.list_node[i] in self.FDC_node_list:
+                colors[i]=1
+            if self.list_node[i] in self.metrology_node_list:
+                colors[i]=2  
         for k in range(N):
             labels[self.data_edges2['from'][k]]=self.list_node[self.data_edges2['from'][k]]
             labels[self.data_edges2['to'][k]]=self.list_node[self.data_edges2['to'][k]]
@@ -139,7 +171,7 @@ class network_visualization:
                     name='Parameters',
                     marker=dict(symbol='circle',
                                     size=15,
-                                    color=layers,
+                                    color=colors,
                                     colorscale='Viridis',
                                     line=dict(color='rgb(50,50,50)', width=4)
                                     ),
