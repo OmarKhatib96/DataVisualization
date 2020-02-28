@@ -91,7 +91,7 @@ class network_visualization:
         self.adjacency_matrix()
         N=len(self.data_edges2)
         Edges=[(self.data_edges2['from'][k], self.data_edges2['to'][k]) for k in range(N)]
-        G=ig.Graph(Edges, directed=False)
+        G=ig.Graph(Edges, directed=True)
         labels=['x' for k in range(self.node_number)]
         layers=[-1 for k in range(self.node_number)]#initialization
         for k in range(N):
@@ -103,8 +103,8 @@ class network_visualization:
 
 
         layt=G.layout('kk',dim=3)
-        Xn=[layt[k][0] for k in range(N)]# x-coordinates of nodes
-        Yn=[layt[k][1] for k in range(N)]# y-coordinates
+        Xn=[layt[k][0] for k in range(self.node_number)]# x-coordinates of nodes
+        Yn=[layt[k][1] for k in range(self.node_number)]# y-coordinates
         Zn=[0 for k in range(self.node_number)]# z-coordinates
         Xe=[]
         Ye=[]
