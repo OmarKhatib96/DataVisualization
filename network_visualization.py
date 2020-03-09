@@ -121,11 +121,11 @@ class network_visualization:
 
         for i in range(self.node_number):
             if self.list_node[i] in self.controllable_node_list:
-                colors[i]="blue"
+                colors[i]=0
             if self.list_node[i] in self.FDC_node_list:
-                colors[i]="brown"
+                colors[i]=1
             if self.list_node[i] in self.metrology_node_list:
-                colors[i]="gold"
+                colors[i]=2  
         for k in range(N):
             labels[self.data_edges2['from'][k]]=self.list_node[self.data_edges2['from'][k]]
             labels[self.data_edges2['to'][k]]=self.list_node[self.data_edges2['to'][k]]
@@ -151,21 +151,10 @@ class network_visualization:
             Ye+=[layt[e[0]][1],layt[e[1]][1], None]
             Ze+=[Zn[e[0]],Zn[e[1]], None]
 
-        print(Zn[0])
-        data=[]
-        print(labels)
+
+                
         import plotly.graph_objs as go
-        for i in range(self.node_number):
-           
-            trace=go.Scatter3d(x=np.array(Xn[i]),y=np.array(Yn[i]),z=np.array(Zn[i]),mode='markers',marker=dict(symbol='circle',
-                                    size=15,
-                                    color=colors[i],
-                                    line=dict(color='rgb(50,50,50)', width=4)
-                                ),  name=labels[i])
 
-
-            print(colors)
-            data.append(trace)
         trace1=go.Scatter3d(x=Xe,
                     y=Ye,
                     z=Ze,
@@ -180,14 +169,14 @@ class network_visualization:
                     z=Zn,
                     mode='markers',
                     name='Parameters',
-                    marker=dict(symbol='circle-open',
+                    marker=dict(symbol='circle',
                                     size=15,
                                     color=colors,
                                     colorscale='Viridis',
                                     line=dict(color='rgb(50,50,50)', width=4)
                                     ),
                     text=labels,
-                    hoverinfo='all'
+                    hoverinfo='text'
                     )
 
         axis=dict(showbackground=False,
@@ -200,7 +189,7 @@ class network_visualization:
        
 
       
-        data.append(trace1)
+        data=[trace1, trace2]
         data.append(go.Mesh3d(
         # 8 vertices of a cube
         x=[-4, 4, 4, -4, -4, 4, 4, -4],
@@ -244,7 +233,7 @@ class network_visualization:
             annotations=[
             dict(
             showarrow=True,
-                text="<b>Data source: Wei-Ting data sample</b>",
+                text="Data source: Wei-Ting data sample",
                 xref='paper',
                 yref='paper',
                 x=0,
@@ -261,53 +250,11 @@ class network_visualization:
             xaxis=dict(axis),
             yaxis=dict(axis),
             zaxis=dict(axis)),
-           title="      <b>Data Visualization of the sample data of edge list<b>"
-
-            
+            title="Data Visualization of the sample data of edge list",
 
         )
         fig=go.Figure(data=data, layout=layout)
 
-        fig.add_layout_image(
-            dict(
-                source="https://upload.wikimedia.org/wikipedia/commons/9/95/Logo_emse.png",
-                xref="paper", yref="paper",
-                x=0.012, y=1,
-                sizex=0.3, sizey=0.2,
-                xanchor="right", yanchor="bottom"
-            )
-        )
-
-        fig.add_layout_image(
-                dict(
-                    source=" https://pbs.twimg.com/profile_images/620547650505560064/P4xNTRTd_400x400.png",
-                    xref="paper", yref="paper",
-                    x=1.08, y=1,
-                    sizex=0.15, sizey=0.15,
-                    xanchor="right", yanchor="bottom"
-                )
-            )
-        fig.add_layout_image(
-        dict(
-            source="https://www.electronicsmedia.info/wp-content/uploads/2020/02/Semiconductors.png",
-            xref="x",
-            yref="y",
-            
-            sizex=2,
-            sizey=2,
-            sizing="stretch",
-            opacity=0.5,
-            layer="below")
-)
-
-
-        fig.update_xaxes(
-            visible=False,
-        )
-        fig.update_yaxes(
-            visible=False,
-        )
-       
         print(" Please wait for the visualization...")
         plotly.offline.plot(fig, filename='Layers Visualization')
         print(" 3D visualization done...")
