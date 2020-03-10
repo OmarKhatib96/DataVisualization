@@ -7,7 +7,6 @@ x5,y1
 u2,x4
 u2,x1
 u2,y2
-u2,x5_t0
 x4,y2
 x6,y3
 u2,x7
@@ -20,15 +19,18 @@ x2_t0,x3_t0
 x3_t0,y1_t0
 x5_t0,y1_t0
 u2_t0,x4_t0
+u2_t0,x1_t0
+u2_t0,y2_t0
 x4_t0,y2_t0
 x6_t0,y3_t0
 u2_t0,x7_t0
 x7_t0,x8_t0
 x7_t0,x9_t0
-u1_t0,u1
+u3_t0,x10_t0
 x2_t0,x2
 x6_t0,x6
 x10_t0,x10
 y1_t0,y1
 y2_t0,y2
 x5_t0,y1
+x5_t0,u2

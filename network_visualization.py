@@ -14,6 +14,8 @@ import igraph as ig
 
 
 class network_visualization:
+
+
     def __init__(self):
         self.edge_number=0
         self.node_number=0
@@ -35,12 +37,13 @@ class network_visualization:
             edge_writer.writerow(fieldnames)
             for i in range (len(data_from)):
                 edge_writer.writerow([self.list_node.index(data_from[i]),self.list_node.index(data_to[i])])
-
-
-         
+            # data_from[0]=list_from[0]=u1, list_node.index(data_from[0])=3
+            # data_to[0]=list_to[0]=x1, list_node.(data_to[0])=5
+            # edge_list2.row[0]=(3,5)
         
 
     def data_importing(self):
+
         data_nodes=pd.read_csv("./data/node_list.csv")
         data_edges=pd.read_csv("./data/edge_list.csv")
         data_controllable_nodes=pd.read_csv("./data/controllable_node.csv")
@@ -54,10 +57,12 @@ class network_visualization:
 
         self.data_edges=data_edges
         self.data_nodes=data_nodes
-        list_node=[]
-        list_layer=[]
-        list_from=[]
-        list_to=[]
+
+        list_node=[] # y3, y1, y2, u1, u2
+        list_layer=[] # 0, 1, 1, 1, 1
+        list_from=[] # u1, x1, x2, x3, x5
+        list_to=[] # x1, x3, x3, y1, y1
+
         for node in data_nodes['node_name']:
             list_node.append(node)
         for layer in data_nodes[' layer']:
@@ -74,13 +79,22 @@ class network_visualization:
             metrology_node_list.append(metrology_node)
         for FDC_node in data_FDC_nodes['FDC_node']:
             FDC_node_list.append(FDC_node)
+
         self.list_node=list_node
-        print(self.list_node)
+        print("node_list: "+str(self.list_node))
+
         self.list_layer=list_layer
+        print("list_layer: "+str(self.list_layer))
+
         self.list_from=list_from
+        print("list_from: "+str(self.list_from))
+
         self.list_to=list_to
-        self.writing_csv(self.list_from,self.list_to)
-        self.data_edges2=pd.read_csv("./data/edge_list2.csv")
+        print("list_to: "+str(self.list_to))
+
+
+        self.writing_csv(self.list_from,self.list_to)  # create edge_list2.csv
+        self.data_edges2=pd.read_csv("./data/edge_list2.csv")   #(to, from)=(list_node.(list_to[0]),list_node.(list_to[0]))
 
         self.controllable_node_list=controllable_node_list
         print("controllable_node_list: "+ str(self.controllable_node_list))
@@ -91,10 +105,17 @@ class network_visualization:
         self.FDC_node_list=FDC_node_list
         print("FDC_node_list: "+ str(self.FDC_node_list))
 
+
+
     def adjacency_matrix(self):
         self.data_importing()
+
         matrix_dimension=len(self.list_node)
+        print("matrix_dimension,list_node: "+str(matrix_dimension))
+
         edge_dimension=len(self.list_from)
+        print("edge_dimension,list_from: "+str(edge_dimension))
+
         self.edge_number=edge_dimension
         self.node_number=matrix_dimension
         adjacency_matrix=np.zeros((matrix_dimension,matrix_dimension))
@@ -114,9 +135,12 @@ class network_visualization:
         self.adjacency_matrix()
         N=len(self.data_edges2)
         Edges=[(self.data_edges2['from'][k], self.data_edges2['to'][k]) for k in range(N)]
+        print("Edges: "+str(Edges))
+
         G=ig.Graph(Edges, directed=True)
         labels=['x' for k in range(self.node_number)]
-        layers=[-1 for k in range(self.node_number)]#initialization
+
+        layers=[-1 for k in range(self.node_number)] # initialization
         colors=[0 for k in range(self.node_number)] # init color
 
         for i in range(self.node_number):
@@ -126,28 +150,64 @@ class network_visualization:
                 colors[i]=1
             if self.list_node[i] in self.metrology_node_list:
                 colors[i]=2  
+
+        print('list_node: '+str(self.list_node))
+
+
         for k in range(N):
             labels[self.data_edges2['from'][k]]=self.list_node[self.data_edges2['from'][k]]
+            # data_edges2['from'][0]= 5, labels[5]=list_node[5]=x1
             labels[self.data_edges2['to'][k]]=self.list_node[self.data_edges2['to'][k]]
+            # data_edges2['to'][0]= 3, labels[3]=list_node[3]=u1
             layers[self.data_edges2['to'][k]]=self.list_layer[self.data_edges2['to'][k]]
+            # data_edges2['from'][0]= 5, layers[5]=list_layer[5]=1
             layers[self.data_edges2['from'][k]]=self.list_layer[self.data_edges2['from'][k]]
-        
-
+            # data_edges2['to'][0]= 3, layers[3]=list_layer[3]=1
 
         layt=G.layout('kk',dim=3)
-        Xn=[layt[k][0] for k in range(self.node_number)]# x-coordinates of nodes
-        Yn=[layt[k][1] for k in range(self.node_number)]# y-coordinates
-        Zn=[0 for k in range(self.node_number)]# z-coordinates
-        Xe=[]
-        Ye=[]
+
+        print('labels: '+str(labels))
+        print("node_number: "+str(self.node_number))         # node_number = 32     
+
+        Xn=[layt[k][0] for k in range(self.node_number)]    # x-coordinates of nodes                       
+        print("x-coordinates of nodes: "+str(Xn))           
+        Yn=[layt[k][1] for k in range(self.node_number)]    # y-coordinates 
+        print("y-coordinates of nodes: "+str(Yn))
+        Zn=[0 for k in range(self.node_number)]             # z-coordinates
+
+        list_node_t=[]
+        list_node_t0=[]
+
+        for k in self.list_node:
+            if 't0' in k:
+                list_node_t0.append(k) 
+            else:
+                list_node_t.append(k) 
+
+        print("list_node_t: "+str(list_node_t))
+
+        for i in list_node_t:
+            Xn[self.list_node.index(i+'_t0')]=Xn[self.list_node.index(i)]
+            Yn[self.list_node.index(i+'_t0')]=Yn[self.list_node.index(i)]
+
+        print("Xn_modified: " + str(Xn))
+        print("Yn_modified: " + str(Yn))
+
+            
+
+        Xe=[] # x-coordinates of edges ends
+        Ye=[] 
         Ze=[]
+
         for k in range(N):
             Zn[self.data_edges2['from'][k]]=self.list_layer[self.data_edges2['from'][k]]
             Zn[self.data_edges2['to'][k]]=self.list_layer[self.data_edges2['to'][k]]
-           
+            # z-coordinates = 0 or 1 
+        print("z-coordinates of nodes: "+str(Zn))
+ 
         
         for e in Edges:
-            Xe+=[layt[e[0]][0],layt[e[1]][0], None]# x-coordinates of edge ends
+            Xe+=[layt[e[0]][0],layt[e[1]][0], None] # x-coordinates of edge ends
             Ye+=[layt[e[0]][1],layt[e[1]][1], None]
             Ze+=[Zn[e[0]],Zn[e[1]], None]
 
@@ -155,6 +215,7 @@ class network_visualization:
                 
         import plotly.graph_objs as go
 
+        # plot edges
         trace1=go.Scatter3d(x=Xe,
                     y=Ye,
                     z=Ze,
@@ -164,7 +225,8 @@ class network_visualization:
                     hoverinfo='none'
                     )
 
-        trace2=go.Scatter3d(x=Xn,
+        # plot nodes
+        trace2=go.Scatter3d(x=Xn,   
                     y=Yn,
                     z=Zn,
                     mode='markers',
@@ -191,9 +253,9 @@ class network_visualization:
       
         data=[trace1, trace2]
         data.append(go.Mesh3d(
-        # 8 vertices of a cube
-        x=[-4, 4, 4, -4, -4, 4, 4, -4],
-        y=[-4, -4, 4, 4, -4, -4, 4, 4],
+        # 8 vertices of a cube  # plot layer t
+        x=[-10, 10, 10, -10, -10, 10, 10, -10],
+        y=[-10, -10, 10, 10, -10, -10, 10, 10],
         z=[1, 1, 1, 1, 1, 1, 1, 1],
         colorbar_title='z',
         colorscale=[[0, 'blue'],
@@ -211,9 +273,9 @@ class network_visualization:
     ))
         data.append(go.Mesh3d(
            
-            # 8 vertices of a cube
-            x=[-4, 4, 4, -4, -4, 4, 4, -4],
-            y=[-4, -4, 4, 4, -4, -4, 4, 4],
+            # 8 vertices of a cube  # plot layer t-1
+            x=[-10, 10, 10, -10, -10, 10, 10, -10],
+            y=[-10, -10, 10, 10, -10, -10, 10, 10],
             z=[0, 0, 0, 0, 0, 0, 0, 0],
             colorbar_title='z',
             colorscale=[[0, 'red'],
@@ -256,7 +318,7 @@ class network_visualization:
         fig=go.Figure(data=data, layout=layout)
 
         print(" Please wait for the visualization...")
-        plotly.offline.plot(fig, filename='Layers Visualization')
+        plotly.offline.plot(fig, filename='Layers Visualization.html')
         print(" 3D visualization done...")
 
   
