@@ -186,18 +186,19 @@ class network_visualization:
 
         print("list_node_t: "+str(list_node_t))
 
-        for i in list_node_t:
+        for i in list_node_t:  # modify t0 nodes
             Xn[self.list_node.index(i+'_t0')]=Xn[self.list_node.index(i)]
             Yn[self.list_node.index(i+'_t0')]=Yn[self.list_node.index(i)]
 
         print("Xn_modified: " + str(Xn))
         print("Yn_modified: " + str(Yn))
-
             
 
         Xe=[] # x-coordinates of edges ends
         Ye=[] 
         Ze=[]
+
+        print("data_edges2: "+str(self.data_edges2))
 
         for k in range(N):
             Zn[self.data_edges2['from'][k]]=self.list_layer[self.data_edges2['from'][k]]
@@ -205,13 +206,43 @@ class network_visualization:
             # z-coordinates = 0 or 1 
         print("z-coordinates of nodes: "+str(Zn))
  
-        
         for e in Edges:
-            Xe+=[layt[e[0]][0],layt[e[1]][0], None] # x-coordinates of edge ends
+            Xe+=[layt[e[0]][0],layt[e[1]][0], None] # x-coordinates of edge start, ends, None
             Ye+=[layt[e[0]][1],layt[e[1]][1], None]
             Ze+=[Zn[e[0]],Zn[e[1]], None]
 
+        print("Xe:" +str(Xe))
+        print("Ye:" +str(Ye))
+        print("Ze:" +str(Ze))
 
+        data_edges_t0=pd.DataFrame(columns=['to', 'from'])
+        data_edges_t=pd.DataFrame(columns=['to', 'from'])
+        index_edges_t0 = []
+        index_edges_t = []
+
+        for k in range(len(self.data_edges)):
+            if 't0' in self.data_edges.iloc[k]['to'] and 't0' in self.data_edges.iloc[k]['from']:
+                index_edges_t0.append(k)
+                data_edges_t0=data_edges_t0.append({'to': self.data_edges.iloc[k]['to'], 'from': self.data_edges.iloc[k]['from']},ignore_index=True)
+            if 't0' not in self.data_edges.iloc[k]['to'] and 't0' not in self.data_edges.iloc[k]['from']:
+                index_edges_t.append(k)
+                data_edges_t=data_edges_t.append({'to': self.data_edges.iloc[k]['to'], 'from': self.data_edges.iloc[k]['from']},ignore_index=True)
+
+        for k in index_edges_t:  # modify t0 intra edges
+            old_index = k  #0
+            old_index_from = k*3 #0
+            old_index_to = k*3+1 #1
+            new_index = self.data_edges[(self.data_edges['from'] == self.data_edges.iloc[k]['from']+'_t0')
+                           & (self.data_edges['to'] == self.data_edges.iloc[k]['to']+'_t0')].index.tolist()[0]  #14
+            new_index_from = new_index*3 #42
+            new_index_to = new_index*3+1 #43
+            #print(old_index,old_index_from,old_index_to,new_index,new_index_from,new_index_to)
+            #print(Xe[old_index_from], Xe[old_index_to])
+            Xe[new_index_from]=Xe[old_index_from]
+            Xe[new_index_to]=Xe[old_index_to]
+            #print(Xe[new_index_from], Xe[new_index_to])
+            Ye[new_index_from]=Ye[old_index_from]
+            Ye[new_index_to]=Ye[old_index_to]
                 
         import plotly.graph_objs as go
 
