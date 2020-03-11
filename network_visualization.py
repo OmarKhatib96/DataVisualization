@@ -132,6 +132,7 @@ class network_visualization:
 
 
     def network_representation(self):
+
         self.adjacency_matrix()
         N=len(self.data_edges2)
         Edges=[(self.data_edges2['from'][k], self.data_edges2['to'][k]) for k in range(N)]
@@ -175,24 +176,22 @@ class network_visualization:
         print("y-coordinates of nodes: "+str(Yn))
         Zn=[0 for k in range(self.node_number)]             # z-coordinates
 
+
+        # modify t0 nodes' posotion x,y
         list_node_t=[]
         list_node_t0=[]
-
         for k in self.list_node:
             if 't0' in k:
                 list_node_t0.append(k) 
             else:
                 list_node_t.append(k) 
-
         print("list_node_t: "+str(list_node_t))
-
-        for i in list_node_t:  # modify t0 nodes
+        for i in list_node_t:  
             Xn[self.list_node.index(i+'_t0')]=Xn[self.list_node.index(i)]
             Yn[self.list_node.index(i+'_t0')]=Yn[self.list_node.index(i)]
-
         print("Xn_modified: " + str(Xn))
         print("Yn_modified: " + str(Yn))
-            
+        # modify t0 nodes' posotion x,y   
 
         Xe=[] # x-coordinates of edges ends
         Ye=[] 
@@ -215,10 +214,14 @@ class network_visualization:
         print("Ye:" +str(Ye))
         print("Ze:" +str(Ze))
 
+
+
         data_edges_t0=pd.DataFrame(columns=['to', 'from'])
         data_edges_t=pd.DataFrame(columns=['to', 'from'])
+        data_edges_from_t0_to_t = pd.DataFrame(columns=['to', 'from'])
         index_edges_t0 = []
         index_edges_t = []
+        index_edges_from_t0_to_t = []
 
         for k in range(len(self.data_edges)):
             if 't0' in self.data_edges.iloc[k]['to'] and 't0' in self.data_edges.iloc[k]['from']:
@@ -227,8 +230,17 @@ class network_visualization:
             if 't0' not in self.data_edges.iloc[k]['to'] and 't0' not in self.data_edges.iloc[k]['from']:
                 index_edges_t.append(k)
                 data_edges_t=data_edges_t.append({'to': self.data_edges.iloc[k]['to'], 'from': self.data_edges.iloc[k]['from']},ignore_index=True)
+            if 't0' in self.data_edges.iloc[k]['from'] and 't0' not in self.data_edges.iloc[k]['to']:
+                index_edges_from_t0_to_t.append(k)
+                data_edges_from_t0_to_t=data_edges_from_t0_to_t.append({'to': self.data_edges.iloc[k]['to'], 'from': self.data_edges.iloc[k]['from']},ignore_index=True)
+        
+        print(data_edges_from_t0_to_t)
+        print(index_edges_from_t0_to_t)
 
-        for k in index_edges_t:  # modify t0 intra edges
+
+
+        # modify t0 intra edges
+        for k in index_edges_t:
             old_index = k  #0
             old_index_from = k*3 #0
             old_index_to = k*3+1 #1
@@ -243,6 +255,35 @@ class network_visualization:
             #print(Xe[new_index_from], Xe[new_index_to])
             Ye[new_index_from]=Ye[old_index_from]
             Ye[new_index_to]=Ye[old_index_to]
+        # modify t0 intra edges
+
+
+
+        for k in index_edges_from_t0_to_t:
+            lenA = len(self.data_edges[(self.data_edges['from'] == self.data_edges.iloc[k]['from'])   #y1_t0,y1
+                         & (self.data_edges['to'] != self.data_edges.iloc[k]['to']+'_t0')].index)
+            lenB = len(self.data_edges[(self.data_edges['to'] == self.data_edges.iloc[k]['from'])
+                         & (self.data_edges['from'] != self.data_edges.iloc[k]['to']+'_t0')].index)
+            old_index = k
+            old_index2 = k*3+1
+            if lenA>1:
+                new_index = self.data_edges[(self.data_edges['from'] == self.data_edges.iloc[k]['from'])   
+                         & (self.data_edges['to'] != self.data_edges.iloc[k]['to']+'_t0')].index.tolist()[0]   
+                new_index2 = new_index*3
+                
+            else:
+                new_index=self.data_edges[(self.data_edges['to'] == self.data_edges.iloc[k]['from'])  # x3_to y1_t0
+                         & (self.data_edges['from'] != self.data_edges.iloc[k]['to']+'_t0')].index.tolist()[0]
+                new_index2 = new_index*3+1
+
+            print("old_index: "+str(old_index)+" old_index2:"+str(old_index2)+" new_index: "+str(new_index)+" new_index_2: "+str(new_index2))
+            
+            print(Xe[old_index2],Xe[new_index2])
+            Xe[old_index2] = Xe[new_index2]
+            Ye[old_index2] = Ye[new_index2]
+            print(Xe[old_index2],Xe[new_index2])
+
+
                 
         import plotly.graph_objs as go
 
