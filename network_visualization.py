@@ -11,11 +11,16 @@ import csv
 import time
 import numpy as np
 import igraph as ig
+from datetime import date
+
 #For animations
 
 
 class network_visualization:
-    def __init__(self):
+    def __init__(self,title,reference,filename):
+        self.filename=filename
+        self.title=title
+        self.reference=reference
         self.edge_number=0
         self.node_number=0
         self.data_edges=0
@@ -111,11 +116,18 @@ class network_visualization:
         return adjacency_matrix
 
 
+
+ 
+
+    
     def network_representation(self):
         self.adjacency_matrix()
         N=len(self.data_edges2)
         Edges=[(self.data_edges2['from'][k], self.data_edges2['to'][k]) for k in range(N)]
+
         G=ig.Graph(Edges, directed=True)
+        layt=G.layout('large')
+
         labels=['x' for k in range(self.node_number)]
         layers=[-1 for k in range(self.node_number)]#initialization
         colors=[0 for k in range(self.node_number)] # init color
@@ -127,6 +139,8 @@ class network_visualization:
                 colors[i]="brown"
             if self.list_node[i] in self.metrology_node_list:
                 colors[i]="gold"
+        
+        
         for k in range(N):
             labels[self.data_edges2['from'][k]]=self.list_node[self.data_edges2['from'][k]]
             labels[self.data_edges2['to'][k]]=self.list_node[self.data_edges2['to'][k]]
@@ -134,11 +148,23 @@ class network_visualization:
             layers[self.data_edges2['from'][k]]=self.list_layer[self.data_edges2['from'][k]]
         
 
+       # G.layout("layout_sphere")
 
-        layt=G.layout('kk',dim=3)
         Xn=[layt[k][0] for k in range(self.node_number)]# x-coordinates of nodes
         Yn=[layt[k][1] for k in range(self.node_number)]# y-coordinates
+        max_yn=max(Yn)
+        max_xn=max(Xn)
+        max_coord=max(max_yn,max_xn)+1
+
+
+
+
         Zn=[0 for k in range(self.node_number)]# z-coordinates
+       
+
+        
+        
+        
         Xe=[]
         Ye=[]
         Ze=[]
@@ -148,48 +174,56 @@ class network_visualization:
            
         
         for e in Edges:
-            Xe+=[layt[e[0]][0],layt[e[1]][0], None]# x-coordinates of edge ends
-            Ye+=[layt[e[0]][1],layt[e[1]][1], None]
-            Ze+=[Zn[e[0]],Zn[e[1]], None]
+            print(Xe)
+            Xe+=[layt[e[0]][0],layt[e[1]][0]]# x-coordinates of edge ends
+            Ye+=[layt[e[0]][1],layt[e[1]][1]]
+            Ze+=[Zn[e[0]],Zn[e[1]]]
 
-        print(Zn[0])
         data=[]
-        print(labels)
         import plotly.graph_objs as go
+
+       
+        #plot the nodes individually
         for i in range(self.node_number):
-           
+            print(labels[i])
             trace=go.Scatter3d(x=np.array(Xn[i]),y=np.array(Yn[i]),z=np.array(Zn[i]),mode='markers',marker=dict(symbol='circle',
                                     size=15,
                                     color=colors[i],
                                     line=dict(color='rgb(50,50,50)', width=4)
-                                ),  name=labels[i])
+                                ),  name=labels[i],
+                                    text=labels[i],
+                                    hoverinfo='text'
+                                
+                                )
 
 
-            print(colors)
             data.append(trace)
-        trace1=go.Scatter3d(x=Xe,
-                    y=Ye,
-                    z=Ze,
-                    mode='lines',
-                    name='Interaction between parameters',
-                    line=dict(color='rgb(125,125,125)', width=2.5),
-                    hoverinfo='none'
-                    )
 
-        trace2=go.Scatter3d(x=Xn,
-                    y=Yn,
-                    z=Zn,
-                    mode='markers',
-                    name='Parameters',
-                    marker=dict(symbol='circle-open',
-                                    size=15,
-                                    color=colors,
-                                    colorscale='Viridis',
-                                    line=dict(color='rgb(50,50,50)', width=4)
-                                    ),
-                    text=labels,
-                    hoverinfo='all'
-                    )
+
+        #plot the nodes individually
+        trace2=[]
+        print(N)
+        print(len(Xe))
+        for i in range(0,len(Xe)-1,2):
+                    
+                    X=[Xe[i],Xe[i+1]]
+                    Y=[Ye[i],Ye[i+1]]
+                    Z=[Ze[i],Ze[i+1]]
+                    
+                    trace2=go.Scatter3d(x=X,y=Y,z=Z,mode='lines', name=labels[self.data_edges2['from'][int(i/2)]]+', '+labels[self.data_edges2['to'][int(i/2)]]
+
+                                            ,line=dict(color='rgb(125,125,125)', width=2.5),
+
+                                            hoverinfo='none'
+                                        
+                                        )
+
+                    X=[]
+                    Y=[]
+                    Z=[]
+
+                    data.append(trace2)
+      
 
         axis=dict(showbackground=False,
                 showline=False,
@@ -201,11 +235,11 @@ class network_visualization:
        
 
       
-        data.append(trace1)
+        #data.append(trace1)
         data.append(go.Mesh3d(
         # 8 vertices of a cube
-        x=[-4, 4, 4, -4, -4, 4, 4, -4],
-        y=[-4, -4, 4, 4, -4, -4, 4, 4],
+        x=[-max_coord, max_coord, max_coord, -max_coord, -max_coord, max_coord, max_coord, -max_coord],
+        y=[-max_coord, -max_coord, max_coord, max_coord, -max_coord, -max_coord, max_coord, max_coord],
         z=[1, 1, 1, 1, 1, 1, 1, 1],
         colorbar_title='z',
         colorscale=[[0, 'blue'],
@@ -224,8 +258,8 @@ class network_visualization:
         data.append(go.Mesh3d(
            
             # 8 vertices of a cube
-            x=[-4, 4, 4, -4, -4, 4, 4, -4],
-            y=[-4, -4, 4, 4, -4, -4, 4, 4],
+            x=[-max_coord, max_coord, max_coord, -max_coord, -max_coord, max_coord, max_coord, -max_coord],
+            y=[-max_coord, -max_coord, max_coord, max_coord, -max_coord, -max_coord, max_coord, max_coord],
             z=[0, 0, 0, 0, 0, 0, 0, 0],
             colorbar_title='z',
             colorscale=[[0, 'red'],
@@ -234,27 +268,31 @@ class network_visualization:
             # Intensity of each vertex, which will be interpolated and color-coded
             intensity = np.linspace(0, 1, 1, endpoint=True),
            
-
+            text='',
             name='Layer t-1',
             showscale=False,
             showlegend=True,
             opacity=0.2
         ))
+        today = date.today()
+
+        today_date = today.strftime("%d/%m/%Y")
+
         
         layout = go.Layout(
             annotations=[
             dict(
-            showarrow=True,
-                text="<b>Data source: Wei-Ting data sample</b>",
+            showarrow=False,
+                text="<b>"+self.reference+" ("+today_date+")"+"</b>",
                 xref='paper',
                 yref='paper',
-                x=0,
-                y=0.1,
+                x=0.01,
+                y=0,
                 xanchor='left',
                 yanchor='bottom',
                 
                 font=dict(
-                size=17
+                size=13
                 )
                 )
             ],
@@ -262,7 +300,6 @@ class network_visualization:
             xaxis=dict(axis),
             yaxis=dict(axis),
             zaxis=dict(axis)),
-           title="      <b>Data Visualization of the sample data of edge list<b>"
 
             
 
@@ -273,7 +310,7 @@ class network_visualization:
             dict(
                 source="https://upload.wikimedia.org/wikipedia/commons/9/95/Logo_emse.png",
                 xref="paper", yref="paper",
-                x=0.012, y=1,
+                x=0.08, y=1,
                 sizex=0.3, sizey=0.2,
                 xanchor="right", yanchor="bottom"
             )
@@ -308,9 +345,13 @@ class network_visualization:
         fig.update_yaxes(
             visible=False,
         )
-       
+        fig.update_layout(title_text="<b>"+self.title+"</b>", title_x=0.5)
+
+
+               
+
         print(" Please wait for the visualization...")
-        plotly.offline.plot(fig, filename='Layers Visualization')
+        plotly.offline.plot(fig, filename=self.filename)
         print(" 3D visualization done...")
 
   
