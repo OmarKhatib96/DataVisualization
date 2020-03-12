@@ -261,27 +261,28 @@ class network_visualization:
 
         for k in index_edges_from_t0_to_t:
             lenA = len(self.data_edges[(self.data_edges['from'] == self.data_edges.iloc[k]['from'])   #y1_t0,y1
-                         & (self.data_edges['to'] != self.data_edges.iloc[k]['to']+'_t0')].index)
+                         & (self.data_edges['to'] != self.data_edges.iloc[k]['to'])].index)
             lenB = len(self.data_edges[(self.data_edges['to'] == self.data_edges.iloc[k]['from'])
-                         & (self.data_edges['from'] != self.data_edges.iloc[k]['to']+'_t0')].index)
+                         & (self.data_edges['from'] != self.data_edges.iloc[k]['to'])].index)
             old_index = k
-            old_index2 = k*3+1
-            if lenA>1:
+            old_index2 = k*3
+            if lenA>=1:
                 new_index = self.data_edges[(self.data_edges['from'] == self.data_edges.iloc[k]['from'])   
-                         & (self.data_edges['to'] != self.data_edges.iloc[k]['to']+'_t0')].index.tolist()[0]   
+                         & (self.data_edges['to'] != self.data_edges.iloc[k]['to'])].index.tolist()[0]   
                 new_index2 = new_index*3
                 
             else:
                 new_index=self.data_edges[(self.data_edges['to'] == self.data_edges.iloc[k]['from'])  # x3_to y1_t0
-                         & (self.data_edges['from'] != self.data_edges.iloc[k]['to']+'_t0')].index.tolist()[0]
+                         & (self.data_edges['from'] != self.data_edges.iloc[k]['to'])].index.tolist()[0]
                 new_index2 = new_index*3+1
 
-            print("old_index: "+str(old_index)+" old_index2:"+str(old_index2)+" new_index: "+str(new_index)+" new_index_2: "+str(new_index2))
+            #print("old_index:"+str(old_index)+" old_index2:"+str(old_index2)+" new_index:"+str(new_index)+" new_index_2:"+str(new_index2))
             
-            print(Xe[old_index2],Xe[new_index2])
+            #print(Xe[old_index2],Xe[new_index2])
             Xe[old_index2] = Xe[new_index2]
             Ye[old_index2] = Ye[new_index2]
-            print(Xe[old_index2],Xe[new_index2])
+            #print(Xe[old_index2],Xe[new_index2])
+            #print()
 
 
                 
