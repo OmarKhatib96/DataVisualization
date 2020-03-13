@@ -81,21 +81,14 @@ class network_visualization:
         for FDC_node in data_FDC_nodes['FDC_node']:
             FDC_node_list.append(FDC_node)
         self.list_node=list_node
-        print(self.list_node)
         self.list_layer=list_layer
         self.list_from=list_from
         self.list_to=list_to
         self.writing_csv(self.list_from,self.list_to)
         self.data_edges2=pd.read_csv("./data/edge_list2.csv")
-
         self.controllable_node_list=controllable_node_list
-        print("controllable_node_list: "+ str(self.controllable_node_list))
-
         self.metrology_node_list=metrology_node_list
-        print("metrology_node_list: "+ str(self.metrology_node_list))
-
         self.FDC_node_list=FDC_node_list
-        print("FDC_node_list: "+ str(self.FDC_node_list))
 
     def adjacency_matrix(self):
         self.data_importing()
@@ -148,10 +141,15 @@ class network_visualization:
             layers[self.data_edges2['from'][k]]=self.list_layer[self.data_edges2['from'][k]]
         
 
-       # G.layout("layout_sphere")
+       
 
+                     
+            
         Xn=[layt[k][0] for k in range(self.node_number)]# x-coordinates of nodes
         Yn=[layt[k][1] for k in range(self.node_number)]# y-coordinates
+            # G.layout("layout_sphere")
+       
+
         max_yn=max(Yn)
         max_xn=max(Xn)
         max_coord=max(max_yn,max_xn)+1
@@ -172,12 +170,21 @@ class network_visualization:
             Zn[self.data_edges2['from'][k]]=self.list_layer[self.data_edges2['from'][k]]
             Zn[self.data_edges2['to'][k]]=self.list_layer[self.data_edges2['to'][k]]
            
+        for sommet in range(self.node_number):
+            for sommet2 in range(self.node_number):
+                if labels[sommet][0:2]==labels[sommet2][0:2] and labels[sommet]!=labels[sommet2]:
+                    Xn[sommet2]=Xn[sommet]
+                    Yn[sommet2]=Yn[sommet]
+    
+        for sommet in range(self.node_number):
+            layt[sommet][0]=Xn[sommet]
+            layt[sommet][1]=Yn[sommet]
         
         for e in Edges:
-            print(Xe)
             Xe+=[layt[e[0]][0],layt[e[1]][0]]# x-coordinates of edge ends
             Ye+=[layt[e[0]][1],layt[e[1]][1]]
             Ze+=[Zn[e[0]],Zn[e[1]]]
+
 
         data=[]
         import plotly.graph_objs as go
@@ -202,8 +209,8 @@ class network_visualization:
 
         #plot the nodes individually
         trace2=[]
-        print(N)
-        print(len(Xe))
+       
+
         for i in range(0,len(Xe)-1,2):
                     
                     X=[Xe[i],Xe[i+1]]
@@ -214,7 +221,8 @@ class network_visualization:
 
                                             ,line=dict(color='rgb(125,125,125)', width=2.5),
 
-                                            hoverinfo='none'
+                                            hoverinfo='none',
+                                            opacity=0.17
                                         
                                         )
 
