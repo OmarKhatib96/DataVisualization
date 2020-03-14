@@ -8,6 +8,8 @@ import wx.lib.scrolledpanel as scrolled
 import os
 import csv
 import threading
+from wx.lib.intctrl import IntCtrl
+
 
 class m:
     # Main panel
@@ -56,16 +58,45 @@ class batttesttab(wx.Panel):
         #Version 
         #Description
         #Confirm for secure connections
-        self.controlunitbutton = wx.Button(panel,-1,label=lab,pos=po,name=nam)
         self.panel=panel
         if(lab=="Open"):
+            self.controlunitbutton = wx.Button(panel,-1,label=lab,pos=po,name=nam)
+
             self.controlunitbutton.Bind(wx.EVT_BUTTON,self.ImportFunc)
 
 
-        if(lab=="Network visualization"):
+        if(lab=="Run"):
+            self.controlunitbutton = wx.Button(panel,-1,label=lab,pos=po,name=nam)
+
             
             self.controlunitbutton.Bind(wx.EVT_BUTTON,self.DownloadNetwork)
+        if(lab=="Settings"):
+            setting_title=wx.StaticText(self.panel,-1,"Model settings",(12,15),(260,-1),wx.ALIGN_CENTER)
+            setting_title.SetBackgroundColour('purple')
+            setting_title.SetForegroundColour('white')
+            self.cb1 = wx.CheckBox(self.panel, label = 'Bayesian network',pos = (20,40)) 
+            self.cb2 = wx.CheckBox(self.panel, label = 'Dynamic Bayesian network',pos = (20,80)) 
+            self.cb3 = wx.CheckBox(self.panel, label = 'Blacklist',pos = (20,120))
+            self.cb4 = wx.CheckBox(self.panel, label = 'Hill climbing-random start',pos = (20,160))
+            wx.StaticText(self.panel,-1,"Number of restarts",(25,200))
+            wx.StaticText(self.panel,-1,"Number of perturbing edges",(25,220))
+            IntCtrl(self.panel,-1,0,(190,195),style=3,min=0,max=20,size=(20,22))
+            IntCtrl(self.panel,-1,0,(190,225),style=1,min=0,max=20,size=(20,22))
 
+
+            self.controlunitbutton = wx.Button(self.panel,-1,label='import',pos=(100,115),name=nam)
+ 
+            wx.StaticText(self.panel,-1,"Training set (%)",(20,275))
+
+            slider=wx.Slider(self.panel,-1,0,0,100,pos=(20,305),size=(190,60),style=wx.SL_AUTOTICKS|wx.SL_LABELS)
+            slider.SetTickFreq(2)
+            wx.StaticText(self.panel,-1,"Application",(20,400))
+
+            self.cb5 = wx.CheckBox(self.panel, label = 'Run to Run control',pos = (25,430)) 
+            self.cb6 = wx.CheckBox(self.panel, label = 'Virtual metrology',pos = (25,460)) 
+            self.cb7 = wx.CheckBox(self.panel, label = 'Process monitoring',pos = (25,490))
+            
+            self.controlunitbutton = wx.Button(self.panel,-1,label='Save',pos=(20,560),name=nam)
 
 
         #self.controlunitbutton.Bind(wx.EVT_BUTTON,self.OnConnect)
@@ -74,7 +105,6 @@ class batttesttab(wx.Panel):
         y1 = 200
         battno = 1
        
-        print("inside the creattab")
         return panel
 
     def DownloadNetwork(self,event):
@@ -282,9 +312,9 @@ class TitleFrame(wx.Frame):
         self.notebook.AddPage(self.tab1.CreateTab("Open",(0,20),"Open"),"Import data")
         
         self.notebook.AddPage(self.tab1.CreateTab("Settings",(0,20),"settings"),"Settings")
-        self.notebook.AddPage(self.tab1.CreateTab("Network visualization",(0,20),"network"),"Network")
+        self.notebook.AddPage(self.tab1.CreateTab("Run",(0,20),"network"),"Network")
         sizer = wx.BoxSizer(wx.HORIZONTAL)
-        sizer.Add(self.notebook, 3, wx.ALL|wx.EXPAND,5)
+        sizer.Add(self.notebook, 1, wx.ALL|wx.EXPAND,5)
 
 
    
