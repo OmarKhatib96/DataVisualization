@@ -192,7 +192,7 @@ class network_visualization:
        
         #plot the nodes individually
         for i in range(self.node_number):
-            print(labels[i])
+            
             trace=go.Scatter3d(x=np.array(Xn[i]),y=np.array(Yn[i]),z=np.array(Zn[i]),mode='markers',marker=dict(symbol='circle',
                                     size=15,
                                     color=colors[i],
@@ -222,9 +222,12 @@ class network_visualization:
                                             ,line=dict(color='rgb(125,125,125)', width=2.5),
 
                                             hoverinfo='none',
-                                            opacity=0.17
+                                            opacity=0.17,
+                                            
                                         
                                         )
+
+
 
                     X=[]
                     Y=[]
@@ -241,7 +244,7 @@ class network_visualization:
                 title=''
                 )
        
-
+        
       
         #data.append(trace1)
         data.append(go.Mesh3d(
@@ -258,8 +261,8 @@ class network_visualization:
         # i, j and k give the vertices of triangles
         name='Layer t',
         showlegend=True,
+        hoverinfo="none",
         opacity=0.2,
-
 
         showscale=False
     ))
@@ -277,6 +280,8 @@ class network_visualization:
             intensity = np.linspace(0, 1, 1, endpoint=True),
            
             text='',
+            hoverinfo="none",
+
             name='Layer t-1',
             showscale=False,
             showlegend=True,
