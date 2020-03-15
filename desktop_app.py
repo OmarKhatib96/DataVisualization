@@ -20,6 +20,21 @@ class batttesttab(wx.Panel):
     def __init__(self, *args, **kw):
         super(batttesttab, self).__init__(*args, **kw)
         self.dirname = os.getcwd()
+        try:
+            # pick an image file you have in the working folder
+            # you can load .jpg  .png  .bmp  or .gif files
+            image_file = 'images.jfif'
+            bmp1 = wx.Image(image_file, wx.BITMAP_TYPE_ANY).ConvertToBitmap()
+            # image's upper left corner anchors at panel coordinates (0, 0)
+            self.bitmap1 = wx.StaticBitmap(self, -1, bmp1, (40, 70),size=(72,72))
+            # show some image details
+            str1 = "%s  %dx%d" % (image_file, bmp1.GetWidth(), bmp1.GetHeight()) 
+            #self.SetTitle(str1)
+        except IOError:
+            #print "Image file %s not found" % imageFile
+            raise SystemExit
+        self.button1 = wx.Button(self.bitmap1, id=-1, label='Button1', pos=(8, 8))
+
 
     def OnOpen(self):
 
@@ -46,33 +61,26 @@ class batttesttab(wx.Panel):
     def SetNotebook(self,notebook):
         self.notebook = notebook
     
-    def SetTestType(self,testtype):
-        self.testtype = testtype
-        return testtype
+    
   
     def CreateTab(self,lab,po,nam):
         panel = wx.Panel(self.notebook, size=(150,150))
-        #TestName
-        #Testid
-        
-        #Version 
-        #Description
-        #Confirm for secure connections
+       
         self.panel=panel
         if(lab=="Open"):
-            self.controlunitbutton = wx.Button(panel,-1,label=lab,pos=po,name=nam)
+            self.controlunitbutton = wx.Button(self.panel,-1,label=lab,pos=po,name=nam)
 
             self.controlunitbutton.Bind(wx.EVT_BUTTON,self.ImportFunc)
 
 
         if(lab=="Run"):
-            self.controlunitbutton = wx.Button(panel,-1,label=lab,pos=po,name=nam)
+            self.controlunitbutton = wx.Button(self.panel,-1,label=lab,pos=po,name=nam)
 
             
             self.controlunitbutton.Bind(wx.EVT_BUTTON,self.DownloadNetwork)
         if(lab=="Settings"):
             setting_title=wx.StaticText(self.panel,-1,"Model settings",(12,15),(260,-1),wx.ALIGN_CENTER)
-            setting_title.SetBackgroundColour('purple')
+            setting_title.SetBackgroundColour('blue')
             setting_title.SetForegroundColour('white')
             self.cb1 = wx.CheckBox(self.panel, label = 'Bayesian network',pos = (20,40)) 
             self.cb2 = wx.CheckBox(self.panel, label = 'Dynamic Bayesian network',pos = (20,80)) 
@@ -96,15 +104,10 @@ class batttesttab(wx.Panel):
             self.cb6 = wx.CheckBox(self.panel, label = 'Virtual metrology',pos = (25,460)) 
             self.cb7 = wx.CheckBox(self.panel, label = 'Process monitoring',pos = (25,490))
             
-            self.controlunitbutton = wx.Button(self.panel,-1,label='Save',pos=(20,560),name=nam)
+            self.controlunitbutton = wx.Button(self.panel,-1,label='Save',pos=(20,530),name=nam)
 
 
-        #self.controlunitbutton.Bind(wx.EVT_BUTTON,self.OnConnect)
-        #Draw the battery progress bars on in a grid format of (rows*cols)
-        #wx.StaticText(panel,-1,"Progress:", (20, 160))
-        y1 = 200
-        battno = 1
-       
+
         return panel
 
     def DownloadNetwork(self,event):
@@ -116,14 +119,18 @@ class batttesttab(wx.Panel):
         print("Your html file is ready!")
    
     def ImportFunc( self, event ):
-
+        self.grid=wx.grid.Grid(self)
+        self.grid.CreateGrid(100,100)
+        sizer = wx.BoxSizer(wx.HORIZONTAL)
+        sizer.Add(self.grid, 1, wx.EXPAND)
+        self.SetSizer(sizer)
+        
         dlg=wx.FileDialog(self, 'Choose a file', self.dirname, '','CSV files (*.csv)|*.csv|All files(*.*)|*.*',wx.FD_OPEN)
         if dlg.ShowModal() == wx.ID_OK:
             self.dirname=dlg.GetDirectory()
             self.filename=os.path.join(self.dirname,dlg.GetFilename())
             self.file=open(self.filename, 'r')
 
-            #check for file format with sniffer
 
 
 
@@ -154,19 +161,21 @@ class batttesttab(wx.Panel):
                 self.file.seek(0)
                 datalist=filedata #append data to datalist
 
-        self.file.close()
-        self.createGrid(datalist, colnames)
-        grid_sizer = wx.BoxSizer(wx.VERTICAL)
-        grid_sizer.Add(self.grid, 1, wx.EXPAND)
-        self.panel.SetSizer(grid_sizer)
-        self.panel.Layout()
-    
+            self.file.close()
+            self.createGrid(datalist, colnames)
+            
+            grid_sizer = wx.BoxSizer(wx.VERTICAL)
+            grid_sizer.Add(self.grid, 1, wx.EXPAND)
+            self.panel.SetSizer(grid_sizer)
+            self.panel.Layout()
+        
     #create the grid
 
     def createGrid(self, datalist, colnames):
         if getattr(self, 'grid', 0): 
             self.grid.Destroy()
-        self.grid=wx.grid.Grid(self, 0)
+        self.grid=wx.grid.Grid(self)
+        print(len(datalist),len(colnames))
         self.grid.CreateGrid(len(datalist), len(colnames)) #create grid, same size as file (rows, cols)
 
         #fill in headings
@@ -178,16 +187,30 @@ class batttesttab(wx.Panel):
             for col in range(len(colnames)):
                 try: 
                     self.grid.SetCellValue(row,col,datalist[row][col])
+                    print("passed the try")
+
                 except: 
+                    print("in the exception of populating")
                     pass
 
-
-        self.grid.AutoSizeColumns(False) # size columns to data (from cvsomatic.py)
+                 
+        self.grid.AutoSizeColumns(True) # size columns to data (from cvsomatic.py)
+        self.SetGridSize()
         self.twiddle()
+        
+        self.Show(True)
+        
 
 
+    def SetGridSize(self):
+        self.grid.AutoSizeRows()
+        self.grid.AutoSizeColumns()
+        #self.sizer.Fit(self)
+
+    
     def twiddle(self): # from http://www.velocityreviews.com/forums/t330788-how-to-update-window-after-wxgrid-is-updated.html
         x,y = self.GetSize()
+        print("size=",x,y)
         self.SetSize((x, y+1))
         self.SetSize((x,y))
         print("inside twiddle")
@@ -204,27 +227,26 @@ class batttesttab(wx.Panel):
 class TitleFrame(wx.Frame):
     def __init__(self, *args, **kw):
         super(TitleFrame, self).__init__(*args, **kw)
-
-        '''
-        self.blue = wx.Panel(self)
-        self.blue.SetBackgroundColour(wx.BLUE)
-        self.fbrowser = wx.GenericDirCtrl(self)
-        # Setup
-        self.AddPage(self.textctrl, "Text Editor")
-        self.AddPage(self.blue, "Blue Panel")
-        self.AddPage(self.fbrowser, "File Browser")
-
-        '''
-
-        frame = wx.Panel.__init__(self, None, title="Integrated Process Control Framework", size=(1000,1000))
+        frame = wx.Panel.__init__(self, None, title="Integrated Process Control Framework", size=(650,650))
         ico = wx.Icon('C:/Users/Omar/Desktop/ISMIN 3A/PE/DataVisualization/logo.ico', wx.BITMAP_TYPE_ICO)
         self.SetIcon(ico)
         self.makeMenuBar()
 
         self.CreateStatusBar()
-        self.SetStatusText("Xeelas BV...")
-        self.notebook=LB.LabelBook(self, -1, agwStyle=LB.INB_FIT_LABELTEXT|LB.INB_LEFT|LB.INB_BOLD_TAB_SELECTION)
+        self.SetStatusText("Ecole des Mines de Saint-Etienne 2020")
+        self.notebook=LB.LabelBook(self, -1, agwStyle=LB.INB_FIT_LABELTEXT|LB.INB_LEFT|LB.INB_BOLD_TAB_SELECTION|LB.INB_GRADIENT_BACKGROUND|LB.INB_BORDER|LB.INB_USE_PIN_BUTTON
+
+
+    )
       
+        #self.notebook=LB.LabelBook(self, -1)
+        #self.notebook=LB.LabelContainer(self,-1)
+
+        #self.notebook=LB.
+
+        self.SetBackgroundColour("grey"+"yellow")
+
+        #self.SetBackgroundStyle(wx.BORDER_SUNKEN)
 
         
     
@@ -249,12 +271,9 @@ class TitleFrame(wx.Frame):
         helpMenu = wx.Menu()
         aboutItem = helpMenu.Append(wx.ID_ABOUT)
 
-        openMenu=wx.Menu
+        #openMenu=wx.Menu
 
-        # Make the menu bar and add the two menus to it. The '&' defines
-        # that the next letter is the "mnemonic" for the menu item. On the
-        # platforms that support it those letters are underlined and can be
-        # triggered from the keyboard.
+    
         menuBar = wx.MenuBar()
         menuBar.Append(fileMenu, "&File")
         menuBar.Append(helpMenu, "&Help")
@@ -276,13 +295,13 @@ class TitleFrame(wx.Frame):
 
     def OnHello(self, event):
         """Say hello to the user."""
-        wx.MessageBox("Hello again from Xeelas")
+        wx.MessageBox("Hello again from FENG Yuan, KHATIB Omar, TESOR Florian ")
 
 
     def OnAbout(self, event):
         """Display an About Dialog"""
-        wx.MessageBox("IoT for Humanity", 
-                    "Xeelas BV",
+        wx.MessageBox("Data visualization for metrology", 
+                    "Ecole des Mines de Saint-Etienne",
         wx.OK|wx.ICON_INFORMATION)
 
 
@@ -304,17 +323,20 @@ class TitleFrame(wx.Frame):
 
     def setup(self):
         self.tab1 = batttesttab(self.notebook)
-        self.tab1.SetNotebook(self.notebook)
              
+        self.tab1.SetNotebook(self.notebook)
 
         # Add the windows to tabs and name them.
 
         self.notebook.AddPage(self.tab1.CreateTab("Open",(0,20),"Open"),"Import data")
-        
         self.notebook.AddPage(self.tab1.CreateTab("Settings",(0,20),"settings"),"Settings")
         self.notebook.AddPage(self.tab1.CreateTab("Run",(0,20),"network"),"Network")
-        sizer = wx.BoxSizer(wx.HORIZONTAL)
-        sizer.Add(self.notebook, 1, wx.ALL|wx.EXPAND,5)
+        sizer = wx.BoxSizer()
+        sizer.Add(self.notebook, 1, wx.EXPAND)
+        self.tab1.SetSizer(sizer)
+        #sizer = wx.BoxSizer(wx.HORIZONTAL)
+        #sizer.Add(self.notebook, 1, wx.ALL|wx.EXPAND,5)
+        #self.sizer=sizer
 
 
    
