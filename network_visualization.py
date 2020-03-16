@@ -17,7 +17,7 @@ from datetime import date
 
 
 class network_visualization:
-    def __init__(self,title,reference,filename):
+    def __init__(self,title,reference,filename,dirData):
         self.filename=filename
         self.title=title
         self.reference=reference
@@ -31,11 +31,12 @@ class network_visualization:
         self.list_from=[]
         self.list_to=[]
         self.data_edges2=0
+        self.dirData=dirData
 
     def writing_csv(self,data_from,data_to):
 
         import csv
-        with open('./data/edge_list2.csv', mode='w') as edge_list_numbers:
+        with open(self.dirData+'/edge_list2.csv', mode='w') as edge_list_numbers:
             edge_writer = csv.writer(edge_list_numbers, delimiter=',', quotechar='"', quoting=csv.QUOTE_MINIMAL)
             fieldnames = ['to', 'from']
             edge_writer.writerow(fieldnames)
@@ -47,11 +48,11 @@ class network_visualization:
         
 
     def data_importing(self):
-        data_nodes=pd.read_csv("./data/node_list.csv")
-        data_edges=pd.read_csv("./data/edge_list.csv")
-        data_controllable_nodes=pd.read_csv("./data/controllable_node.csv")
-        data_metrology_nodes=pd.read_csv("./data/metrology_node.csv")
-        data_FDC_nodes=pd.read_csv("./data/FDC_node.csv")
+        data_nodes=pd.read_csv(self.dirData+"/node_list.csv")
+        data_edges=pd.read_csv(self.dirData+"/edge_list.csv")
+        data_controllable_nodes=pd.read_csv(self.dirData+"/controllable_node.csv")
+        data_metrology_nodes=pd.read_csv(self.dirData+"/metrology_node.csv")
+        data_FDC_nodes=pd.read_csv(self.dirData+"/FDC_node.csv")
 
         controllable_node_list=[]
         metrology_node_list=[]
@@ -85,7 +86,7 @@ class network_visualization:
         self.list_from=list_from
         self.list_to=list_to
         self.writing_csv(self.list_from,self.list_to)
-        self.data_edges2=pd.read_csv("./data/edge_list2.csv")
+        self.data_edges2=pd.read_csv(self.dirData+"/edge_list2.csv")
         self.controllable_node_list=controllable_node_list
         self.metrology_node_list=metrology_node_list
         self.FDC_node_list=FDC_node_list

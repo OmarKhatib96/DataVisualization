@@ -10,7 +10,6 @@ import csv
 import threading
 from wx.lib.intctrl import IntCtrl
 from threading import Thread
-import wx.richtext as rt
 
 
 class batttesttab(wx.Panel):
@@ -53,26 +52,13 @@ class batttesttab(wx.Panel):
         if(lab=="Home"):
             self.panelHome=panel
             try:
-        
+                text=wx.StaticText(self.panelHome,-1,"Welcome to the Integrated Process Control Framework! ",(25,50))
+                text.SetFont(font)
+
                 image_file = 'C:/Users/Omar/Desktop/ISMIN 3A/PE/DataVisualization/images.jfif'
                 bmp1 = wx.Image(image_file, wx.BITMAP_TYPE_ANY).ConvertToBitmap()
                 self.panelHome.bitmap1 = wx.StaticBitmap(self.panelHome, -1, bmp1, (40, 70),size=(200,200))
                 str1 = "%s  %dx%d" % (image_file, bmp1.GetWidth(), bmp1.GetHeight()) 
-
-                #pParagraph
-
-                self.rtc1 = rt.RichTextCtrl(self.panelHome,pos=(10,300),size=(350,90),style=wx.VSCROLL|wx.HSCROLL|wx.NO_BORDER|wx.FONTFAMILY_DEFAULT|wx.TEXT_ATTR_FONT_FACE)
-                self.rtc2 = rt.RichTextCtrl(self.panelHome,pos=(10,400),size=(350,90),style=wx.VSCROLL|wx.HSCROLL|wx.NO_BORDER|wx.FONTFAMILY_DEFAULT|wx.TEXT_ATTR_FONT_FACE)
-
-                self.Show()
-                """
-                attr_super = wx.richtext.RichTextAttr()
-                attr_super.SetTextEffects(wx.TEXT_ATTR_EFFECT_SUPERSCRIPT)
-                attr_super.SetFlags(wx.TEXT_ATTR_EFFECTS)
-                attr_super.SetTextEffectFlags(wx.TEXT_ATTR_EFFECT_SUPERSCRIPT)
-                self.rtc1.WriteText("Is this super?")
-                self.rtc1.SetStyle (7, 13, attr_super)
-                """
 
             except IOError:
                 raise SystemExit
@@ -90,9 +76,11 @@ class batttesttab(wx.Panel):
 
         if(lab=="Run"):
             self.panelRun=panel
+            self.controlunitbutton2 = wx.Button(self.panelRun,-1,label="Import data",pos=(10,70),name=nam)
+            self.controlunitbutton2.Bind(wx.EVT_BUTTON,self.GoToDirectory)
+
             
-            
-            text=wx.StaticText(self.panelRun,-1,"Launch the data visualization",(20,20))
+            text=wx.StaticText(self.panelRun,-1,"Launch the data visualization",(50,20))
             text.SetFont(font)
 
             self.controlunitbutton = wx.Button(self.panelRun,-1,label=lab,pos=po,name=nam)
@@ -136,58 +124,75 @@ class batttesttab(wx.Panel):
 
         return panel
 
-    def DownloadNetwork(self,event):
+
+    def GoToDirectory(self,event):
         
+        dlg = wx.DirDialog(self, "Choose a directory:",style=wx.DD_DEFAULT_STYLE)
+                           #| wx.DD_DIR_MUST_EXIST
+                           #| wx.DD_CHANGE_DIR
+                           
+        if dlg.ShowModal() == wx.ID_OK:
+            try:
+                self.dirData=dlg.GetPath()
+                dlg = wx.MessageBox( 'The folder has been added successfully! ', 'Integrated Process Control Framework',  wx.ICON_INFORMATION)
+
+            except:
+                print("import failed")
 
 
 
+    def DownloadNetwork(self,event):
         from network_visualization import network_visualization
-        net_vis=network_visualization("Data visualization with 2 layers"," Wei-Ting Sample","Datavisualization.html")
-        net_vis.network_representation()
-        print("Your html file is ready!")
+        net_vis=network_visualization("Data visualization with 2 layers"," Wei-Ting Sample","Datavisualization.html",self.dirData)
+        try:
+            net_vis.network_representation()
+            print("Your html file is ready!")
+
+        except:
+            dlg = wx.MessageBox( 'The program can not read data, please change the directory', 'Integrated Process Control Framework',  wx.ICON_ERROR )
         
     def ImportFunc( self, event ):  
-        
-        dlg=wx.FileDialog(self, 'Choose a file', self.dirname, '','CSV files (*.csv)|*.csv|All files(*.*)|*.*',wx.FD_OPEN)
-        if dlg.ShowModal() == wx.ID_OK:
-            self.dirname=dlg.GetDirectory()
-            self.filename=os.path.join(self.dirname,dlg.GetFilename())
-            self.file=open(self.filename, 'r')
-            dialect=csv.Sniffer().sniff(self.file.readline())
-            self.file.seek(0)
-            csvfile=csv.reader(self.file,dialect)
-            filedata = [] 
-            filedata.extend(csvfile)
-            self.file.seek(0)
-        
-            sample=self.file.read(2048)
-            self.file.seek(0)
-            if csv.Sniffer().has_header(sample): 
-                colnames=next(csvfile) 
-                datalist=[] 
-                datalist.extend(filedata[1:len(filedata)]) 
 
-            else:
-                row1=next(csvfile) 
-                colnames=[]
-                for i in range(len(row1)):
-                    colnames.append('col_%d' % i) 
+        try:
+            dlg=wx.FileDialog(self, 'Choose a file', self.dirname, '','CSV files (*.csv)|*.csv|All files(*.*)|*.*',wx.FD_OPEN)
+            if dlg.ShowModal() == wx.ID_OK:
+                self.dirname=dlg.GetDirectory()
+                self.filename=os.path.join(self.dirname,dlg.GetFilename())
+                self.file=open(self.filename, 'r')
+                dialect=csv.Sniffer().sniff(self.file.readline())
                 self.file.seek(0)
-                datalist=filedata 
+                csvfile=csv.reader(self.file,dialect)
+                filedata = [] 
+                filedata.extend(csvfile)
+                self.file.seek(0)
+            
+                sample=self.file.read(2048)
+                self.file.seek(0)
+                if csv.Sniffer().has_header(sample): 
+                    colnames=next(csvfile) 
+                    datalist=[] 
+                    datalist.extend(filedata[1:len(filedata)]) 
 
-            self.file.close()
-            self.createGrid(datalist, colnames)     
-            grid_sizer = wx.BoxSizer(wx.VERTICAL)
-            grid_sizer.Add(self.grid,flag=wx.ALIGN_CENTER_HORIZONTAL)
-            grid_sizer.AddStretchSpacer()
+                else:
+                    row1=next(csvfile) 
+                    colnames=[]
+                    for i in range(len(row1)):
+                        colnames.append('col_%d' % i) 
+                    self.file.seek(0)
+                    datalist=filedata 
 
-            self.panelOpen.SetSizer(grid_sizer)
+                self.file.close()
+                self.createGrid(datalist, colnames)     
+                grid_sizer = wx.BoxSizer(wx.VERTICAL)
+                grid_sizer.Add(self.grid,flag=wx.ALIGN_CENTER_HORIZONTAL)
+                grid_sizer.AddStretchSpacer()
 
+                self.panelOpen.SetSizer(grid_sizer)
+        except:
 
-            #self.panelOpen.Refresh()
-        
-    #create the grid
-
+            dlg = wx.MessageBox( 'The program can not read data, please change your csv file', 'Integrated Process Control Framework',  wx.ICON_ERROR )
+            dlg.Destroy()
+    
     def createGrid(self, datalist, colnames):
         if getattr(self, 'grid', 0): 
             self.grid.Destroy()
@@ -224,9 +229,6 @@ class batttesttab(wx.Panel):
         self.SetSize((x, y+1))
         self.SetSize((x,y))
         print("inside twiddle")
-        #self.grid.SetDefaultCellAlignment(wx.ALIGN_CENTRE, wx.ALIGN_CENTRE)
-
-        #self.SetGridAlignment(wx.ALIGN_CENTRE,wx.ALIGN_CENTRE,x,y)
 
 
     def Exit(self, event):
@@ -253,13 +255,6 @@ class TitleFrame(wx.Frame):
 
     )
       
-       
-
-        self.SetBackgroundColour("grey"+"yellow")
-
-
-        
-    
     def makeMenuBar(self):
              
         fileMenu = wx.Menu()
@@ -321,7 +316,7 @@ class TitleFrame(wx.Frame):
         self.notebook.AddPage(self.tab1.CreateTab("Home",(20,45),"Home"),"Home")
         self.notebook.AddPage(self.tab1.CreateTab("Open",(20,45),"Open"),"Import data")
         self.notebook.AddPage(self.tab1.CreateTab("Settings",(20,45),"settings"),"Settings")
-        self.notebook.AddPage(self.tab1.CreateTab("Run",(20,45),"network"),"Network")
+        self.notebook.AddPage(self.tab1.CreateTab("Run",(180,70),"network"),"Network")
        
 
    
