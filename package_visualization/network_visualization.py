@@ -13,7 +13,6 @@ import numpy as np
 import igraph as ig
 from datetime import date
 
-#For animations
 
 
 class network_visualization:
@@ -34,7 +33,7 @@ class network_visualization:
         self.dirData=dirData
 
     def writing_csv(self,data_from,data_to):
-
+        '''This function writes in a new csv file the nodes numerically'''
         import csv
         with open(self.dirData+'/edge_list2.csv', mode='w') as edge_list_numbers:
             edge_writer = csv.writer(edge_list_numbers, delimiter=',', quotechar='"', quoting=csv.QUOTE_MINIMAL)
@@ -48,17 +47,15 @@ class network_visualization:
         
 
     def data_importing(self):
+        '''Import different csv files from the the data folder'''
         data_nodes=pd.read_csv(self.dirData+"/node_list.csv")
         data_edges=pd.read_csv(self.dirData+"/edge_list.csv")
         data_controllable_nodes=pd.read_csv(self.dirData+"/controllable_node.csv")
         data_metrology_nodes=pd.read_csv(self.dirData+"/metrology_node.csv")
         data_FDC_nodes=pd.read_csv(self.dirData+"/FDC_node.csv")
-
         controllable_node_list=[]
         metrology_node_list=[]
         FDC_node_list=[]
-
-
         self.data_edges=data_edges
         self.data_nodes=data_nodes
         list_node=[]
@@ -71,10 +68,8 @@ class network_visualization:
             list_layer.append(layer)
         for from_node in data_edges['from']:
             list_from.append(from_node)
-
         for to_node in data_edges['to']:
-            list_to.append(to_node)
-        
+            list_to.append(to_node)       
         for controllable_node in data_controllable_nodes['controllable_node']:
             controllable_node_list.append(controllable_node)
         for metrology_node in data_metrology_nodes['metrology_node']:
@@ -91,31 +86,31 @@ class network_visualization:
         self.metrology_node_list=metrology_node_list
         self.FDC_node_list=FDC_node_list
 
+
     def adjacency_matrix(self):
-        self.data_importing()
-        matrix_dimension=len(self.list_node)
-        edge_dimension=len(self.list_from)
-        self.edge_number=edge_dimension
-        self.node_number=matrix_dimension
-        adjacency_matrix=np.zeros((matrix_dimension,matrix_dimension))
+            self.data_importing()
+            matrix_dimension=len(self.list_node)
+            edge_dimension=len(self.list_from)
+            self.edge_number=edge_dimension
+            self.node_number=matrix_dimension
+            adjacency_matrix=np.zeros((matrix_dimension,matrix_dimension))
 
 
-        for i in range(edge_dimension):
-            current_node_from=self.list_from[i]
-            current_node_to=self.list_to[i]
-            index_node_from=self.list_node.index(current_node_from)
-            index_node_to=self.list_node.index(current_node_to)
-            adjacency_matrix.itemset((index_node_from,index_node_to),1)
+            for i in range(edge_dimension):
+                current_node_from=self.list_from[i]
+                current_node_to=self.list_to[i]
+                index_node_from=self.list_node.index(current_node_from)
+                index_node_to=self.list_node.index(current_node_to)
+                adjacency_matrix.itemset((index_node_from,index_node_to),1)
 
-        return adjacency_matrix
+            return adjacency_matrix
 
 
-
- 
-
-    
     def network_representation(self):
+
+        '''Builds the connected network'''
         self.adjacency_matrix()
+
         N=len(self.data_edges2)
         Edges=[(self.data_edges2['from'][k], self.data_edges2['to'][k]) for k in range(N)]
 
@@ -139,30 +134,16 @@ class network_visualization:
             labels[self.data_edges2['from'][k]]=self.list_node[self.data_edges2['from'][k]]
             labels[self.data_edges2['to'][k]]=self.list_node[self.data_edges2['to'][k]]
             layers[self.data_edges2['to'][k]]=self.list_layer[self.data_edges2['to'][k]]
-            layers[self.data_edges2['from'][k]]=self.list_layer[self.data_edges2['from'][k]]
-        
-
-       
-
-                     
+            layers[self.data_edges2['from'][k]]=self.list_layer[self.data_edges2['from'][k]]                   
             
         Xn=[layt[k][0] for k in range(self.node_number)]# x-coordinates of nodes
-        Yn=[layt[k][1] for k in range(self.node_number)]# y-coordinates
-            # G.layout("layout_sphere")
-       
+        Yn=[layt[k][1] for k in range(self.node_number)]# y-coordinates of the nodes
+        Zn=[0 for k in range(self.node_number)]# z-coordinates of the node
 
+        '''To scatter the nodes as much as possible on the layer'''
         max_yn=max(Yn)
         max_xn=max(Xn)
-        max_coord=max(max_yn,max_xn)+1
-
-
-
-
-        Zn=[0 for k in range(self.node_number)]# z-coordinates
-       
-
-        
-        
+        max_coord=max(max_yn,max_xn)+1   
         
         Xe=[]
         Ye=[]
@@ -227,9 +208,6 @@ class network_visualization:
                                             
                                         
                                         )
-
-
-
                     X=[]
                     Y=[]
                     Z=[]
@@ -247,7 +225,6 @@ class network_visualization:
        
         
       
-        #data.append(trace1)
         data.append(go.Mesh3d(
         # 8 vertices of a cube
         x=[-max_coord, max_coord, max_coord, -max_coord, -max_coord, max_coord, max_coord, -max_coord],
@@ -282,7 +259,6 @@ class network_visualization:
            
             text='',
             hoverinfo="none",
-
             name='Layer t-1',
             showscale=False,
             showlegend=True,
@@ -332,7 +308,7 @@ class network_visualization:
 
         fig.add_layout_image(
                 dict(
-                    source=" https://pbs.twimg.com/profile_images/620547650505560064/P4xNTRTd_400x400.png",
+                    source="https://pbs.twimg.com/profile_images/620547650505560064/P4xNTRTd_400x400.png",
                     xref="paper", yref="paper",
                     x=1.08, y=1,
                     sizex=0.15, sizey=0.15,
@@ -362,7 +338,7 @@ class network_visualization:
         fig.update_layout(title_text="<b>"+self.title+"</b>", title_x=0.5)
 
 
-               
+       
 
         print(" Please wait for the visualization...")
         plotly.offline.plot(fig, filename=self.filename)

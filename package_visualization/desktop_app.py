@@ -12,15 +12,16 @@ from wx.lib.intctrl import IntCtrl
 from threading import Thread
 
 
-class batttesttab(wx.Panel):
+class bat(wx.Panel):
+    ''' bat class creates the main panel of the GUI'''
     def __init__(self, *args, **kw):
-        super(batttesttab, self).__init__(*args, **kw)
+        super(bat, self).__init__(*args, **kw)
         self.dirname = os.getcwd()
        
 
 
-    def OnOpen(self):
-
+    def OnOpen(self): 
+        '''handler for opening files from the GUI'''
         if self.contentNotSaved:
             if wx.MessageBox("Current content has not been saved! Proceed?", "Please confirm",
                             wx.ICON_QUESTION | wx.YES_NO, self) == wx.NO:
@@ -45,8 +46,8 @@ class batttesttab(wx.Panel):
     
   
     def CreateTab(self,lab,po,nam):
+        '''Create a new window from the already existing tab'''
         font = wx.Font(10, wx.FONTFAMILY_DEFAULT, wx.FONTSTYLE_NORMAL, wx.FONTWEIGHT_BOLD,underline=False)
-
         panel = wx.Panel(self.notebook, size=(150,150))
 
         if(lab=="Home"):
@@ -54,7 +55,6 @@ class batttesttab(wx.Panel):
             try:
                 text=wx.StaticText(self.panelHome,-1,"Welcome to the Integrated Process Control Framework! ",(25,50))
                 text.SetFont(font)
-
                 image_file = './images/images.jfif'
                 bmp1 = wx.Image(image_file, wx.BITMAP_TYPE_ANY).ConvertToBitmap()
                 self.panelHome.bitmap1 = wx.StaticBitmap(self.panelHome, -1, bmp1, (40, 70),size=(200,200))
@@ -65,32 +65,23 @@ class batttesttab(wx.Panel):
     
         if(lab=="Open"):
             self.panelOpen=panel
-
             text=wx.StaticText(self.panelOpen,-1,"Choose a csv file",(20,20))
             text.SetFont(font)
-
             self.controlunitbutton = wx.Button(self.panelOpen,-1,label=lab,pos=po,name=nam)
-
             self.controlunitbutton.Bind(wx.EVT_BUTTON,self.ImportFunc)
 
 
         if(lab=="Run"):
             self.panelRun=panel
             self.controlunitbutton2 = wx.Button(self.panelRun,-1,label="Import data",pos=(10,70),name=nam)
-            self.controlunitbutton2.Bind(wx.EVT_BUTTON,self.GoToDirectory)
-
-            
+            self.controlunitbutton2.Bind(wx.EVT_BUTTON,self.GoToDirectory)           
             text=wx.StaticText(self.panelRun,-1,"Launch the data visualization",(50,20))
             text.SetFont(font)
-
-            self.controlunitbutton = wx.Button(self.panelRun,-1,label=lab,pos=po,name=nam)
-
-            
+            self.controlunitbutton = wx.Button(self.panelRun,-1,label=lab,pos=po,name=nam)          
             self.controlunitbutton.Bind(wx.EVT_BUTTON,self.DownloadNetwork)
             
         if(lab=="Settings"):
-            self.panelSettings=panel
-            
+            self.panelSettings=panel         
             setting_title=wx.StaticText(self.panelSettings,-1,"Model settings",(12,15),(260,-1),wx.ALIGN_CENTER)
             setting_title.SetBackgroundColour('blue')
             setting_title.SetForegroundColour('white')
@@ -102,30 +93,21 @@ class batttesttab(wx.Panel):
             wx.StaticText(self.panelSettings,-1,"Number of perturbing edges",(25,220))
             IntCtrl(self.panelSettings,-1,0,(190,195),style=3,min=0,max=20,size=(20,22))
             IntCtrl(self.panelSettings,-1,0,(190,225),style=1,min=0,max=20,size=(20,22))
-
-
             self.controlunitbutton = wx.Button(self.panelSettings,-1,label='import',pos=(100,115),name=nam)
-
             self.controlunitbutton.Bind(wx.EVT_BUTTON,self.ImportFunc)
-
             wx.StaticText(self.panelSettings,-1,"Training set (%)",(20,275))
-
             slider=wx.Slider(self.panelSettings,-1,0,0,100,pos=(20,305),size=(190,60),style=wx.SL_AUTOTICKS|wx.SL_LABELS)
             slider.SetTickFreq(2)
             wx.StaticText(self.panelSettings,-1,"Application",(20,400))
-
             self.cb5 = wx.CheckBox(self.panelSettings, label = 'Run to Run control',pos = (25,430)) 
             self.cb6 = wx.CheckBox(self.panelSettings, label = 'Virtual metrology',pos = (25,460)) 
-            self.cb7 = wx.CheckBox(self.panelSettings, label = 'Process monitoring',pos = (25,490))
-            
+            self.cb7 = wx.CheckBox(self.panelSettings, label = 'Process monitoring',pos = (25,490))            
             self.controlunitbutton = wx.Button(self.panelSettings,-1,label='Save',pos=(20,530),name=nam)
-
-
-
         return panel
 
 
     def GoToDirectory(self,event):
+        '''Opens and handles the open folder event (from stack overflow)'''
         
         dlg = wx.DirDialog(self, "Choose a directory:",style=wx.DD_DEFAULT_STYLE)
                            #| wx.DD_DIR_MUST_EXIST
@@ -142,16 +124,16 @@ class batttesttab(wx.Panel):
 
 
     def DownloadNetwork(self,event):
+        '''Launches the visualization on the html file'''
         from package_visualization.network_visualization import network_visualization
         net_vis=network_visualization("Data visualization with 2 layers"," Wei-Ting Sample","Datavisualization.html",self.dirData)
-        try:
-            net_vis.network_representation()
-            print("Your html file is ready!")
+        net_vis.network_representation()
+        print("Your html file is ready!")
 
-        except:
-            dlg = wx.MessageBox( 'The program can not read data, please change the directory', 'Integrated Process Control Framework',  wx.ICON_ERROR )
+      
         
     def ImportFunc( self, event ):  
+        '''Import csv files from browser, taken from the internet (stackoverflow)'''
 
         try:
             dlg=wx.FileDialog(self, 'Choose a file', self.dirname, '','CSV files (*.csv)|*.csv|All files(*.*)|*.*',wx.FD_OPEN)
@@ -194,6 +176,7 @@ class batttesttab(wx.Panel):
             dlg.Destroy()
     
     def createGrid(self, datalist, colnames):
+        '''Create grid (this function was taken from the internet)'''
         if getattr(self, 'grid', 0): 
             self.grid.Destroy()
         self.grid=wx.grid.Grid(self.panelOpen)#crucial tu put self.panelOpen in parameter
@@ -215,15 +198,11 @@ class batttesttab(wx.Panel):
                  
         self.twiddle()
         
-        
-    def SetGridAlignment(self,halign,valign,nrows,ncols):
-      
-        for ii in range(nrows):
-            for jj in range(ncols):
-                self.grid.SetCellAlignment(ii,jj,halign,valign)
+
 
     
     def twiddle(self): # from http://www.velocityreviews.com/forums/t330788-how-to-update-window-after-wxgrid-is-updated.html
+        '''resize the grid inside the panel'''
         x,y = self.GetSize()
         self.SetSize((x, y+1))
         self.SetSize((x,y))
@@ -240,6 +219,7 @@ class batttesttab(wx.Panel):
 
 
 class TitleFrame(wx.Frame):
+    '''The main frame class'''
     def __init__(self, *args, **kw):
         super(TitleFrame, self).__init__(*args, **kw)
         frame = wx.Panel.__init__(self, None, title="Integrated Process Control Framework", size=(650,650))
@@ -255,6 +235,7 @@ class TitleFrame(wx.Frame):
     )
       
     def makeMenuBar(self):
+        '''Makes the menu bar'''
              
         fileMenu = wx.Menu()
 
@@ -264,40 +245,39 @@ class TitleFrame(wx.Frame):
         exitItem = fileMenu.Append(wx.ID_EXIT)
 
         helpMenu = wx.Menu()
-        aboutItem = helpMenu.Append(wx.ID_ABOUT)
-
-
-    
+        aboutItem = helpMenu.Append(wx.ID_ABOUT) 
         menuBar = wx.MenuBar()
         menuBar.Append(fileMenu, "&File")
         menuBar.Append(helpMenu, "&Help")
-
         self.SetMenuBar(menuBar)
-
         self.Bind(wx.EVT_MENU, self.OnHello, helloItem)
         self.Bind(wx.EVT_MENU, self.OnExit,  exitItem)
         self.Bind(wx.EVT_MENU, self.OnAbout, aboutItem)  
 
 
     def OnExit(self, event):
+        '''Handles the Exit click button'''
         self.Close(True)
 
 
     def OnHello(self, event):
+        '''Handles the Hello click button'''
         wx.MessageBox("Hello again from FENG Yuan, KHATIB Omar, TESOR Florian ")
 
 
     def OnAbout(self, event):
+        '''Handles the About click button'''
         wx.MessageBox("Data visualization for metrology", 
-                    "Ecole des Mines de Saint-Etienne",
+                    "Ecole des Mines de Saint-Etienne 2020",
         wx.OK|wx.ICON_INFORMATION)
 
 
 
     def OnClose(self, event):
+        
         try:
             dlg = wx.MessageDialog(self,
-            "Do you really want to stop testing?",
+            "Do you really want to stop thhe program?",
             "Confirm Exit", wx.OK|wx.CANCEL|wx.ICON_QUESTION)
             result = dlg.ShowModal()
             dlg.Destroy()
@@ -310,7 +290,8 @@ class TitleFrame(wx.Frame):
 
 
     def setup(self):
-        self.tab1 = batttesttab(self.notebook)
+        '''This function creates the different windows (onglets) in the main panel'''
+        self.tab1 = bat(self.notebook)
         self.tab1.SetNotebook(self.notebook)
         self.notebook.AddPage(self.tab1.CreateTab("Home",(20,45),"Home"),"Home")
         self.notebook.AddPage(self.tab1.CreateTab("Open",(20,45),"Open"),"Import data")
