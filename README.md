@@ -1,4 +1,4 @@
-# Foobar
+# Integrated Process Control Framework
 
 
 Integrated Process Control Framework is a visualization tool has been developed using Python. It allows us through an interactive
