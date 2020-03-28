@@ -24,7 +24,7 @@ pip3 install plotly wxPython pandas python-igraph PIL matplotlib
 Use the package manager [pip3](https://pip.pypa.io/en/stable/) to install Integrated Process Control Framework
 
 ```bash
-pip3 install -i https://test.pypi.org/simple/ package-visualization-tool-PE-emse2020==0.0.3
+pip install -i https://test.pypi.org/simple/ package-visualization-tool-PE-emse2020==0.0.4
 ```
 
 ## Usage
