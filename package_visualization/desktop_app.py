@@ -126,11 +126,13 @@ class bat(wx.Panel):
     def DownloadNetwork(self,event):
         '''Launches the visualization on the html file'''
         from package_visualization.network_visualization import network_visualization
-        net_vis=network_visualization("Data visualization with 2 layers"," Wei-Ting Sample","Datavisualization.html",self.dirData)
-        net_vis.network_representation()
-        print("Your html file is ready!")
+        try:
+            net_vis=network_visualization("Data visualization with 2 layers"," Wei-Ting Sample","Datavisualization.html",self.dirData)
+            net_vis.network_representation()
+            print("Your html file is ready!")
 
-      
+        except:
+            dlg = wx.MessageBox( 'The program can not read data, please change the directory', 'Integrated Process Control Framework',  wx.ICON_ERROR )
         
     def ImportFunc( self, event ):  
         '''Import csv files from browser, taken from the internet (stackoverflow)'''
