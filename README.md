@@ -1,7 +1,7 @@
 # Integrated Process Control Framework
 
 
-Integrated Process Control Framework is a visualization tool has been developed using Python. It allows us through an interactive
+Integrated Process Control Framework is a visualization tool that has been developed using Python. It allows us through an interactive
 layout to visualize the correlation of different parameters involved in the semiconductor
 industry.
 After days of searching, we’ve found out that the Python library Plotly is the best package for
