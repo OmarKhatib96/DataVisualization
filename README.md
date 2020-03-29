@@ -15,7 +15,7 @@ visualization.
 ## Software Requirements
 
 Use the package manager [pip3](https://pip.pypa.io/en/stable/) to install the following python libraries
-
+This application runs on Windows 10 and macOS. Linux seems to have problem with the python-igraph library and its C compiler.
 ```bash
 pip3 install plotly wxPython pandas python-igraph PIL matplotlib
 ```
