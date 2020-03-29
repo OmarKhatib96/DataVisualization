@@ -1,7 +1,7 @@
 # Integrated Process Control Framework
 
 
-Integrated Process Control Framework is a visualization tool has been developed using Python. It allows us through an interactive
+Integrated Process Control Framework is a visualization tool that has been developed using Python. It allows us through an interactive
 layout to visualize the correlation of different parameters involved in the semiconductor
 industry.
 After days of searching, we’ve found out that the Python library Plotly is the best package for
@@ -14,8 +14,10 @@ visualization.
 
 ## Software Requirements
 
-Use the package manager [pip3](https://pip.pypa.io/en/stable/) to install the following python libraries
+Use the package manager [pip3](https://pip.pypa.io/en/stable/) to install the following python libraries.
 
+
+This application runs on Windows 10 and macOS. Linux seems to have problem with the python-igraph library and its C compiler.
 ```bash
 pip3 install plotly wxPython pandas python-igraph PIL matplotlib
 ```
