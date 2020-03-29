@@ -5,7 +5,7 @@ with open("README.md", "r") as fh:
 
 setuptools.setup(
     name="package_visualization_tool_PE-emse2020", # Replace with your own username
-    version="0.0.1",
+    version="0.0.4",
     author="Ecole des Mines de Saint-Etienne 2020",
     author_email="khatibomar3@gmail.com",
     description="Data Visualization for metrology",

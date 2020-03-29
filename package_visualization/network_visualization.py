@@ -298,7 +298,7 @@ class network_visualization:
 
         fig.add_layout_image(
             dict(
-                source="https://upload.wikimedia.org/wikipedia/commons/9/95/Logo_emse.png",
+                source="https://lh3.googleusercontent.com/E2WkrhsxCLuWapVpch6SLoix0yT8qw1z8Ey_e-_ISSxpffe1-FAoNdJiwUIPH-vwGnrGDoacuzi9frBLjQ",
                 xref="paper", yref="paper",
                 x=0.08, y=1,
                 sizex=0.3, sizey=0.2,
